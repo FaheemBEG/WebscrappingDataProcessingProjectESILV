@@ -1,6 +1,7 @@
 # WebscrappingDataProcessingProjectESILV
 Webscrapping &amp; Data Processing - ESILV Project
-Faheem BEG & Adrien BAUDIER
+
+**Faheem BEG & Arthur BAUDIER**
 
 
 1- Install required modules
