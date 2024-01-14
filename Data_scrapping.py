@@ -13,6 +13,86 @@ import os
 
 path="C:/Users/fahee/OneDrive/Bureau/ETUDE/S9/Webscapping_and_Data_Processing/WebscrappingDataProcessingProjectESILV/_data"
 
+def scrap_processors_en():
+
+    def multicolumn(column:str,level:int):
+        multicolumns=[]
+        if level==1:
+            return column
+        
+        for k in range(level):
+            multicolumns.append(column)
+        return tuple(multicolumns)
+
+    url_processor_list=["https://en.wikipedia.org/wiki/List_of_Intel_processors"]
+    df_processor=pd.DataFrame()
+    for url in url_processor_list:
+
+        # Faire la requête HTTP et obtenir le contenu de la page
+        response_processor = requests.get(url)
+        html_processor = BeautifulSoup(response_processor.text, 'html.parser')
+
+        dataframes=[]
+        # Finding all tables
+        tables = html_processor.find_all('table',class_=lambda x: x and "wikitable" in x)
+
+        for table in tables:
+            df=pd.read_html(StringIO(str(table)))
+            df=pd.concat(df)
+
+
+            try:
+                if 'Processor family' in df.columns and 'Model' in df.columns:
+                    df["Model"]=df[multicolumn("Processor family",df.columns.nlevels)]+ ' '+ df[multicolumn("Model",df.columns.nlevels)]
+                
+                df=df[["Model","TDP (W)"]]
+                df=df.dropna()
+                df=df.astype('string')
+                
+                df1=pd.DataFrame()
+                df1['Model'] = df.iloc[:, 0]
+                df1['TDP (W)'] = df.iloc[:, 1]
+                dataframes.append(df1)
+
+            except KeyError as k:
+                    
+                if 'TDP (W)' not in df.columns and 'TDP' not in df.columns:
+                    df[multicolumn("TDP (W)",df.columns.nlevels)]= ""
+
+                # if 'Processor family' in df.columns and 'Model' in df.columns:
+                #     df["Model"]=df[multicolumn("Processor family",df.columns.nlevels)]+ ' '+ df[multicolumn("Model",df.columns.nlevels)]
+                
+                if 'Model' not in df.columns:
+                    try:
+                        df["Model"]=df[multicolumn("Model",df.columns.nlevels)]
+                    except Exception:
+                        df['Model'] = ""
+
+                try:
+                    df=df[["Model","TDP (W)"]]
+
+                except KeyError as k:
+                    try:
+                        df=df[["Model","TDP"]]
+                    except Exception:
+                        pass
+
+                df=df.dropna()
+                df=df.astype('string')
+                dataframe=pd.DataFrame()
+
+                # Ajouter les données des colonnes "(Modèle, Modèle)" à "Modèle"
+                dataframe['Model'] = df.iloc[:, 0]
+                dataframe['TDP (W)'] = df.iloc[:, 1]
+                dataframes.append(dataframe)
+
+    df_processor=pd.concat(dataframes, ignore_index=True)
+
+    df_processor=df_processor[df_processor["Model"] !="<NA>"]
+    df_processor=df_processor[df_processor["Model"] !=""]
+
+    return df_processor
+
 def scrap_processors(path:str=path):
     url_processor_list=["https://fr.wikipedia.org/wiki/Liste_des_microprocesseurs_Intel"]    
     
@@ -25,14 +105,14 @@ def scrap_processors(path:str=path):
 
         dataframes=[]
         # Finding all tables
-        tables = html_processor.find_all('table')
+        tables = html_processor.find_all('table',class_=lambda x: x and "wikitable" in x)
 
         for table in tables:
             df=pd.read_html(StringIO(str(table)))
             df=pd.concat(df)
 
             try:
-                df=df[["Modèle","TDP"]]
+                df=df[["Modèle","TDP "]]
                 df=df.dropna()
                 df=df.astype('string')
                 dataframes.append(df)
@@ -69,12 +149,26 @@ def scrap_processors(path:str=path):
     df_processor = df_processor.drop(df_processor.columns[[2,3]], axis=1)
 
     df_processor = df_processor[df_processor['TDP'].str.endswith('W')]
+    df_processor['TDP'] = pd.to_numeric(df_processor['TDP'].str.rstrip('W').str.replace(',', '.'), errors='coerce').fillna(65)
+    # On fixe à 65W les TDP non mentionnés
+
     df_processor['Modèle'] = df_processor['Modèle'].str.replace('-', " ", regex=True)
     df_processor = df_processor.reset_index(drop=True)
 
+    df_processor=df_processor.rename(columns={"Modèle":"Model","TDP":"TDP (W)"})
+
+    df_processor2=scrap_processors_en(path=path)
+    df_processor=pd.concat([df_processor,df_processor2],ignore_index=True)
+
+    df_processor = df_processor.drop_duplicates(subset='Model')
     df_processor.to_csv(f"{path}/processors.csv",index=False)
 
     print(f"\nProcessors list data file successfuly created !")
+
+    return
+    
+def scrap_graphiccards(path:str=path):
+
     return
 
 def scrap_howlongtobbeat():
@@ -169,14 +263,13 @@ def scrap_data():
     print(f"\n Creating data files . . .")
     scrap_processors()
     scrap_canyourunit()
-    print(f"\n>>> Downloading Boavizta data file")
 
+    print(f"\n>>> Downloading Boavizta data file")
     if os.path.exists(f"{path}/boavizta-data.csv"):
         os.remove(f"{path}/boavizta-data.csv")
 
     wget.download("https://raw.githubusercontent.com/Boavizta/environmental-footprint-data/main/boavizta-data-us.csv",f"{path}/boavizta-data.csv")
     print(f"\nData scrapped and data files successfuly created in : {path}")
-
 
 if __name__ == "__main__":
     scrap_data()
