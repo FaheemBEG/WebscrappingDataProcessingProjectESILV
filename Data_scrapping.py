@@ -1,13 +1,16 @@
-from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from io import StringIO
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
+
 import wget
 import os
 
@@ -157,7 +160,7 @@ def scrap_processors(path:str=path):
 
     df_processor=df_processor.rename(columns={"Modèle":"Model","TDP":"TDP (W)"})
 
-    df_processor2=scrap_processors_en(path=path)
+    df_processor2=scrap_processors_en()
     df_processor=pd.concat([df_processor,df_processor2],ignore_index=True)
 
     df_processor = df_processor.drop_duplicates(subset='Model')
@@ -181,6 +184,7 @@ def scrap_howlongtobbeat():
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.get('https://howlongtobeat.com/?q=recently%2520updated')
+    #driver.get('https://howlongtobeat.com/?q=')
     wait = WebDriverWait(driver, 10)
     popup_button = wait.until(EC.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler')))
     popup_button.click()    
@@ -221,37 +225,88 @@ def scrap_canyourunit():
     # WORK IN PROGRESS
     print(f"\n>>> Scrapping games system requirements from the CanYouRunIt website ...")
 
-    # Configuration pour le mode headless
+    # Chrome options
     chrome_options = Options()
     chrome_options.add_argument('--headless')
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get('https://www.systemrequirementslab.com/cyri')
-    wait = WebDriverWait(driver, 10)
-    popup_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'css-47sehv')))
-    popup_button.click()
-    wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, 'css-47sehv')))
-    requirements_list = []
-    for title in df.head(1)['Title']:
-        input_field = driver.find_element(By.ID, 'select-repo-ts-control')
-        input_field.clear()
-        input_field.send_keys(title)
-        # if exist
-        element_to_click = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "select-repo-opt-1")))
-        element_to_click.click()
-        #element_to_click = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "button-cyri-bigblue")))
-        element_to_click = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='button-cyri-bigblue' or @id='requirements-button']")))
-        element_to_click.click()
-        latest_graphics_cards_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='container']//div[@class='row']//ul")))
-        requirements = driver.find_elements(By.XPATH, "//div[@class='container']//div[@class='row']//ul")[1]
-        results = requirements.text.strip()
-        result = [line.split(": ") for line in results.split("\n")[:4]]
-        data_dict = {item[0]: item[1] for item in result}
-        data_dict['Title'] = title
-        requirements_list.append(data_dict)
+    requirements_list=[]
+    url = "https://www.systemrequirementslab.com/all-games-list/?filter="
+    end_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+    for letter in end_list: # Browsing all games pages starting with a specific caracter in end_list 
+        driver.get(url + letter)
+        wait = WebDriverWait(driver, 10)
+        driver.implicitly_wait(10)
+
+        # Accepting cookies
+        try:
+            driver.find_element(By.XPATH,'//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]').click()
+        except NoSuchElementException:
+            pass
+
+        # Waiting that class: "pt-3 pb-1 pl-3" is there
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'pt-3.pb-1.pl-3')))
+
+        # Finding all element having the class: "page-item". It corresponds to games.
+        page_items = driver.find_elements(By.CSS_SELECTOR, '.list-unstyled .page-item')
+
+        max=3 #maximum number of games to scrap for example
+
+        # Parcourir les éléments cliquables et cliquer sur chacun
+        if len(page_items) >=max:
+            iter=max
+
+        else:
+            iter= len(page_items)
+        for k in range(iter):
+            xpath=f'//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/ul/li[{k+1}]/a'
+            page_item=driver.find_element(By.XPATH, xpath)
+
+            # Scrapping game title
+            title = page_item.text.strip()
+
+            # Clicking on game page
+            try:
+                driver.execute_script("arguments[0].scrollIntoView();", page_item)
+                wait.until(EC.element_to_be_clickable(page_item))
+                driver.execute_script("arguments[0].click();", page_item)
+
+            except Exception as e:
+                print(f"Erreur lors du clic : {e}")
+                continue
+
+            # Scrapping data :
+            try:
+                element_to_scrape = driver.find_element(By.XPATH, '//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/div[4]/div[1]/div[1]')
+                driver.execute_script("arguments[0].scrollIntoView();", element_to_scrape)
+
+                # Fulfilling dictionnary
+                table=element_to_scrape.text
+                result = [line.split(": ") for line in table.split("\n")[:4]]
+                data_dict={}
+                dict = {item[0]: item[1] for item in result}
+
+                data_dict['Title'] = title
+                if 'CPU' in dict.keys():
+                    data_dict['CPU']=dict['CPU'] 
+                if 'VIDEO CARD' in dict.keys():
+                    data_dict['GPU']=dict['VIDEO CARD']
+                if 'RAM' in dict.keys():
+                    data_dict['RAM']=dict['RAM']
+
+                requirements_list.append(data_dict)
+
+            except NoSuchElementException:
+                pass
+
+            # Go back to games list page
+            driver.back()
+
     driver.quit()
     requirements_df = pd.DataFrame(requirements_list)
-    final_df = pd.merge(df, requirements_df, on='Title', how='left')
+    final_df = pd.merge(df, requirements_df, on='Title', how='outer')
 
     final_df.to_csv(f"{path}/games.csv",index=False)
 
