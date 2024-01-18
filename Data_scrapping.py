@@ -181,8 +181,8 @@ def scrap_howlongtobbeat():
 
     games_list=[]
     game_page=1 # Initialisation of this variable
-    max_games_per_page=2 # Maximum number of games per page to scrap for example
-    max_pages=3 # Maximum number of games list pages 
+    max_games_per_page=30 # Maximum number of games per page to scrap for example. Default 30
+    max_pages=3600 # Maximum number of games list pages. Default 3600
 
     # Chrome options
     chrome_options = Options()
@@ -257,9 +257,12 @@ def scrap_howlongtobbeat():
 
                 # Waiting for the page to load
                 wait = WebDriverWait(driver, 10)
-                wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))  
 
                 # Scrapping main story game time
+                try:
+                    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))  
+                except Exception:
+                    continue
                 main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
                 driver.execute_script("arguments[0].scrollIntoView();", main_story_time_element)
                 table=main_story_time_element.text.strip()
@@ -325,7 +328,7 @@ def scrap_canyourunit():
     # WORK IN PROGRESS
     print(f"\n>>> Scrapping games system requirements from the CanYouRunIt website ...")
 
-    max=1 #maximum number of games to scrap per page
+    max=1000 #maximum number of games to scrap per page. Default 1000
 
     # Chrome options
     chrome_options = Options()
@@ -357,9 +360,9 @@ def scrap_canyourunit():
         # Parcourir les éléments cliquables et cliquer sur chacun
         if len(page_items) >=max:
             iter=max
-
         else:
             iter= len(page_items)
+
         for k in range(iter):
             xpath=f'//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/ul/li[{k+1}]/a'
             page_item=driver.find_element(By.XPATH, xpath)
