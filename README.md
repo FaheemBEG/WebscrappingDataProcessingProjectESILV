@@ -8,10 +8,11 @@ Webscrapping &amp; Data Processing - ESILV Project
 In your terminal execute:
  `pip install -r requirements.txt`
 
-2- Create database by scrapping websites:
+2- Install full dataset by scrapping websites:
 In your terminal execute:
 `python Data_scrapping.py`
+Data files will be created into the `_data` folder
 
 Note:
-    An extract of full data is available in `_data` folder
+    An extract of full dataset is also available in `_data` folder, so that you don't need to run run `Data_scrapping.py` adn wait your dataset to be downloaded
 

@@ -179,45 +179,144 @@ def scrap_howlongtobbeat():
 
     print(f"\n>>> Scrapping games data from HowLongToBeat.com ...")
 
-    # Configuration pour le mode headless
+    games_list=[]
+    game_page=1 # Initialisation of this variable
+    max_games_per_page=2 # Maximum number of games per page to scrap for example
+    max_pages=3 # Maximum number of games list pages 
+
+    # Chrome options
     chrome_options = Options()
     chrome_options.add_argument('--headless')
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get('https://howlongtobeat.com/?q=recently%2520updated')
-    #driver.get('https://howlongtobeat.com/?q=')
+    driver.get('https://howlongtobeat.com/?q=')
+
     wait = WebDriverWait(driver, 10)
-    popup_button = wait.until(EC.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler')))
-    popup_button.click()    
-    wait.until(EC.invisibility_of_element_located((By.ID, 'onetrust-accept-btn-handler')))
-    max_for_test = 5 #A ENLEVER LORSQUE LA PHASE DE DEV SERA FINIE
-    games_data = {}
-    next_page_button = driver.find_elements(By.XPATH, "//button[@class='Pagination_right__GwBE_ form_button Pagination_inactive__dnoZF' and text()='>']")
-    cpt = 0
-    while next_page_button and cpt <= max_for_test:
-        cpt+=1
-        next_page_button = driver.find_elements(By.XPATH, "//button[@class='Pagination_right__GwBE_ form_button Pagination_inactive__dnoZF' and text()='>']")
-        list_items = driver.find_elements(By.XPATH, "//div[@class='content_100']/ul/li")
-        for item in list_items:
-            title = item.find_element(By.XPATH, ".//h3").text.strip()
-            game_details = {}
-            time_details_div = item.find_element(By.XPATH, ".//div[@class='GameCard_search_list_details_block__XEXkr']")
-            time_details = time_details_div.find_elements(By.XPATH, ".//div[@class='GameCard_search_list_tidbit__0r_OP text_white shadow_text']")
-            for detail in time_details:
-                category = detail.text.strip()
-                time = detail.find_element(By.XPATH, "./following-sibling::div").text.strip()
-                game_details[category] = time
-            games_data[title] = game_details
-        wait = WebDriverWait(driver, 10)
-        next_page_button[0].click()
-        wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='Pagination_right__GwBE_ form_button Pagination_inactive__dnoZF' and text()='>']")))
+
+    # Accepting cookies
+    try:
+        popup_button = wait.until(EC.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler')))
+        popup_button.click()
+        wait.until(EC.invisibility_of_element_located((By.ID, 'onetrust-accept-btn-handler')))
+    except NoSuchElementException:
+        pass
+
+    page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
+
+    if len(page_items) >=max_games_per_page:
+        iter_games=max_games_per_page
+    else:
+        iter_games= len(page_items)
+
+    try:
+        number_of_pages=wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="__next"]/div/main/div/div/div[6]/div/button[2]')))
+        driver.execute_script("arguments[0].scrollIntoView();", number_of_pages)
+        number_of_pages = int(number_of_pages.text.strip())
+        print(f"Number of pages : {number_of_pages}")
+
+    except NoSuchElementException:
+        raise Exception
+
+    if number_of_pages >=max_pages:
+        iter_pages=max_pages
+    else:
+        iter_pages= number_of_pages
+
+    for p in range(iter_pages):
+        print("Page number: ",game_page)
+        print("Number of games in this page: ",len(page_items))
+        for k in range(iter_games):
+            page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
+            
+
+            xpath=f'//*[@id="search-results-header"]/ul/li[{k+1}]/div/div[2]/h3/a'
+
+            # Waiting for the page to load
+            wait = WebDriverWait(driver, 10)
+            wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+
+            page_item=driver.find_element(By.XPATH, xpath)
+
+            # Clicking on game page
+            try:
+                driver.execute_script("arguments[0].scrollIntoView();", page_item)
+                wait.until(EC.element_to_be_clickable(page_item))
+
+                # Scrapping game title
+                title = page_item.text.strip()
+                driver.execute_script("arguments[0].click();", page_item)
+
+            except Exception as e:
+                print(f"Erreur lors du clic : {e}")
+                continue
+
+            # Scrapping data :
+            try:
+                games_data={}
+                games_data["Title"]=title
+
+                # Waiting for the page to load
+                wait = WebDriverWait(driver, 10)
+                wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))  
+
+                # Scrapping main story game time
+                main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
+                driver.execute_script("arguments[0].scrollIntoView();", main_story_time_element)
+                table=main_story_time_element.text.strip()
+                mainstory = table.partition("Main Story")[2].strip()
+                try:
+                    mainstory = mainstory.partition("Hours")[0].strip()
+                except Exception:
+                    mainstory = table.partition("Main Story")[2].strip()
+                games_data["Main Story (Hours)"]=mainstory
+
+                # Scrapping plateform
+                plateform_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]')
+                driver.execute_script("arguments[0].scrollIntoView();", plateform_element)
+                table=plateform_element.text.strip()
+                plateform = table.partition("Platforms:")[2].strip()
+                games_data["Platforms"]=plateform
+
+                # Scrapping genres
+                genres_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]')
+                driver.execute_script("arguments[0].scrollIntoView();", genres_element)
+                table=genres_element.text.strip()
+                genres = table.partition("Genres:")[2].strip()
+                games_data["Genres"]=genres
+
+                games_list.append(games_data)
+
+                wait = WebDriverWait(driver, 10)
+                
+            except NoSuchElementException:
+                pass
+
+            # Go back to games list page
+            driver.back()
+
+        if game_page==1:
+            next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]')))
+        else:
+            next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]')))
+
+        game_page+=1
+
+        # Clicking on next page
+        try:
+            driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+            wait.until(EC.element_to_be_clickable(next_page_button))
+            driver.execute_script("arguments[0].click();", next_page_button)
+
+        except NoSuchElementException:
+            raise Exception
+        
     driver.quit()
 
-    df = pd.DataFrame.from_dict(games_data, orient='index')
-    df.reset_index(inplace=True)
-    df.rename(columns={'index': 'Title'}, inplace=True)
+    df_games = pd.DataFrame(games_list)
+    df_games.reset_index(inplace=True,drop=True)
+    df_games["Main Story (Hours)"] = df_games["Main Story (Hours)"].str.extract('(\d+)').astype(int)
 
-    return df
+    return df_games
 
 def scrap_canyourunit():
 
@@ -225,6 +324,8 @@ def scrap_canyourunit():
 
     # WORK IN PROGRESS
     print(f"\n>>> Scrapping games system requirements from the CanYouRunIt website ...")
+
+    max=1 #maximum number of games to scrap per page
 
     # Chrome options
     chrome_options = Options()
@@ -252,8 +353,6 @@ def scrap_canyourunit():
 
         # Finding all element having the class: "page-item". It corresponds to games.
         page_items = driver.find_elements(By.CSS_SELECTOR, '.list-unstyled .page-item')
-
-        max=1 #maximum number of games to scrap per page
 
         # Parcourir les éléments cliquables et cliquer sur chacun
         if len(page_items) >=max:
