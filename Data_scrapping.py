@@ -17,7 +17,7 @@ import os
 path="C:/Users/fahee/OneDrive/Bureau/ETUDE/S9/Webscapping_and_Data_Processing/WebscrappingDataProcessingProjectESILV/_data"
 
 def scrap_processors_en():
-
+    
     def multicolumn(column:str,level:int):
         multicolumns=[]
         if level==1:
@@ -28,9 +28,10 @@ def scrap_processors_en():
         return tuple(multicolumns)
 
     url_processor_list=["https://en.wikipedia.org/wiki/List_of_Intel_processors"]
+    
     df_processor=pd.DataFrame()
     for url in url_processor_list:
-
+        print(f"\n>>> Scrapping Intel processors list from : {url} ...")
         # Faire la requête HTTP et obtenir le contenu de la page
         response_processor = requests.get(url)
         html_processor = BeautifulSoup(response_processor.text, 'html.parser')
@@ -252,7 +253,7 @@ def scrap_canyourunit():
         # Finding all element having the class: "page-item". It corresponds to games.
         page_items = driver.find_elements(By.CSS_SELECTOR, '.list-unstyled .page-item')
 
-        max=3 #maximum number of games to scrap for example
+        max=1 #maximum number of games to scrap per page
 
         # Parcourir les éléments cliquables et cliquer sur chacun
         if len(page_items) >=max:
