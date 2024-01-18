@@ -9,12 +9,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 import wget
 import os
 
-path="C:/Users/fahee/OneDrive/Bureau/ETUDE/S9/Webscapping_and_Data_Processing/WebscrappingDataProcessingProjectESILV/_data"
+# Root directory:
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+path="C:/Users/fahee/Desktop/ETUDE/s9/WebscrappingDataProcessingProjectESILV/_data"
 
 def scrap_processors_en():
     
@@ -162,9 +165,21 @@ def scrap_processors(path:str=path):
     df_processor=df_processor.rename(columns={"Modèle":"Model","TDP":"TDP (W)"})
 
     df_processor2=scrap_processors_en()
-    df_processor=pd.concat([df_processor,df_processor2],ignore_index=True)
 
     df_processor = df_processor.drop_duplicates(subset='Model')
+
+    # Data Postprocessing
+    df_processor["Model"] = df_processor["Model"].str.extract(r'([^\[]*)')
+
+    mask = df_processor["Model"].str.contains("^i\d")
+    # Add "Core " for intel core i processors
+    df_processor.loc[mask, "Model"] = "Core " + df_processor.loc[mask, "Model"]
+
+    # Merging both dataframes
+    df_processor_final = pd.merge(df_processor, df_processor2, on='Model', how='outer',suffixes=('', '_processor2'))
+    df_processor_final['TDP (W)'] = df_processor_final['TDP (W)'].combine_first(df_processor_final['TDP (W)_processor2'])
+
+
     df_processor.to_csv(f"{path}/processors.csv",index=False)
 
     print(f"\nProcessors list data file successfuly created !")
@@ -173,6 +188,67 @@ def scrap_processors(path:str=path):
     
 def scrap_graphiccards(path:str=path):
 
+    url_graphic_card="https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units"
+    print(f"\n>>> Scrapping NVIDIA GPU list from : {url_graphic_card} ...")
+    # HTTP request
+    response_gc = requests.get(url_graphic_card)
+    html_gc = BeautifulSoup(response_gc.text, 'html.parser')
+
+    dataframes=[]
+    # Finding all tables
+    tables = html_gc.find_all('table')
+
+    for table in tables:
+        df=pd.read_html(StringIO(str(table)))
+        df=pd.concat(df)
+        try:
+            df=df[["Model","TDP (Watts)"]]
+            
+            #dataframes.append(df)
+            #df.info()
+        except KeyError as k:
+            if 'TDP (Watts)' not in df.columns and ('TDP (watts)') not in df.columns:
+                df['TDP (Watts)'] = ""
+            
+            if 'Model' not in df.columns:
+                df['Model'] = ""
+
+            if ('TDP (watts)')  in df.columns:
+                df=df[["Model","TDP (watts)"]]
+
+            elif ('TDP (watts)') not in df.columns:
+                df=df[["Model","TDP (Watts)"]]
+
+            #dataframes.append(df)
+            #df.info()
+
+        df=df.dropna()
+        df=df.astype('string')
+
+        # Supprimer les colonnes en double
+        df = df.loc[:, ~df.columns.duplicated()]
+
+        dataframe=pd.DataFrame()
+
+        dataframe['Model'] = df.iloc[:,0]
+
+        dataframe['TDP (Watts)'] = df.iloc[:,1]
+
+        df=dataframe
+        dataframes.append(df)
+
+
+    df_gc=pd.concat(dataframes, ignore_index=True)
+    df_gc=df_gc[df_gc["Model"] !=""]
+    df_gc=df_gc[df_gc["Model"] !="Model"]
+
+    # Data Postprocessing
+    df_gc["TDP (Watts)"] = df_gc["TDP (Watts)"].str.extract('(\d+)[\s-]?').astype(float)
+    df_gc["Model"] = df_gc["Model"].str.extract(r'([^\[]*)')
+
+    df_gc.to_csv(f"{path}/gpu.csv",index=False)
+
+    print(f"\Graphic cards list data file successfuly created !")
     return
 
 def scrap_howlongtobbeat():
@@ -182,14 +258,15 @@ def scrap_howlongtobbeat():
     games_list=[]
     game_page=1 # Initialisation of this variable
     max_games_per_page=30 # Maximum number of games per page to scrap for example. Default 30
-    max_pages=3600 # Maximum number of games list pages. Default 3600
+    max_pages=15 # Maximum number of games list pages. Default 3600
 
     # Chrome options
     chrome_options = Options()
     chrome_options.add_argument('--headless')
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get('https://howlongtobeat.com/?q=')
+    #driver.get('https://howlongtobeat.com/?q=') # Uncomment to scrapp all games
+    driver.get('https://howlongtobeat.com/?q=a') # Scrapping only games starting with 'a' for exemple
 
     wait = WebDriverWait(driver, 10)
 
@@ -201,7 +278,10 @@ def scrap_howlongtobbeat():
     except NoSuchElementException:
         pass
 
-    page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
+    try:
+        page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
+    except TimeoutException:
+        page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish GameCard_search_list__IuMbi')))
 
     if len(page_items) >=max_games_per_page:
         iter_games=max_games_per_page
@@ -226,8 +306,11 @@ def scrap_howlongtobbeat():
         print("Page number: ",game_page)
         print("Number of games in this page: ",len(page_items))
         for k in range(iter_games):
-            page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
-            
+
+            try:
+                wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="search-results-header"]/ul')))
+            except Exception:
+                raise Exception
 
             xpath=f'//*[@id="search-results-header"]/ul/li[{k+1}]/div/div[2]/h3/a'
 
@@ -254,16 +337,20 @@ def scrap_howlongtobbeat():
             try:
                 games_data={}
                 games_data["Title"]=title
-
+                print(title)
                 # Waiting for the page to load
                 wait = WebDriverWait(driver, 10)
 
                 # Scrapping main story game time
-                try:
-                    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))  
-                except Exception:
-                    continue
-                main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
+                try:                                                      
+                    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))
+                    main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
+                    print("Main Story found")                            
+                except TimeoutException:
+                    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')))
+                    main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')
+                    print("Main Story found")
+                
                 driver.execute_script("arguments[0].scrollIntoView();", main_story_time_element)
                 table=main_story_time_element.text.strip()
                 mainstory = table.partition("Main Story")[2].strip()
@@ -272,6 +359,8 @@ def scrap_howlongtobbeat():
                 except Exception:
                     mainstory = table.partition("Main Story")[2].strip()
                 games_data["Main Story (Hours)"]=mainstory
+                print("Main Story scrapped")
+
 
                 # Scrapping plateform
                 plateform_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]')
@@ -279,6 +368,7 @@ def scrap_howlongtobbeat():
                 table=plateform_element.text.strip()
                 plateform = table.partition("Platforms:")[2].strip()
                 games_data["Platforms"]=plateform
+                print("Platforms scrapped")
 
                 # Scrapping genres
                 genres_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]')
@@ -286,7 +376,9 @@ def scrap_howlongtobbeat():
                 table=genres_element.text.strip()
                 genres = table.partition("Genres:")[2].strip()
                 games_data["Genres"]=genres
+                print("Genres scrapped")
 
+                print(games_data)
                 games_list.append(games_data)
 
                 wait = WebDriverWait(driver, 10)
@@ -296,11 +388,18 @@ def scrap_howlongtobbeat():
 
             # Go back to games list page
             driver.back()
+        
+        wait = WebDriverWait(driver, 20)
 
         if game_page==1:
             next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]')))
+            next_page_button = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]')
         else:
             next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]')))
+            next_page_button = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]')
+
+        driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+        wait.until(EC.element_to_be_clickable(next_page_button))
 
         game_page+=1
 
@@ -317,7 +416,10 @@ def scrap_howlongtobbeat():
 
     df_games = pd.DataFrame(games_list)
     df_games.reset_index(inplace=True,drop=True)
-    df_games["Main Story (Hours)"] = df_games["Main Story (Hours)"].str.extract('(\d+)').astype(int)
+    try:
+        df_games["Main Story (Hours)"] = df_games["Main Story (Hours)"].str.extract('(\d+)').astype(int)
+    except Exception:
+        pass
 
     return df_games
 
@@ -337,7 +439,10 @@ def scrap_canyourunit():
     driver = webdriver.Chrome(options=chrome_options)
     requirements_list=[]
     url = "https://www.systemrequirementslab.com/all-games-list/?filter="
-    end_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    #end_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    # Uncomment if you want to scrapp all games
+
+    end_list = ['a','b','c'] # Only scrapping 3 pages for exemple
 
 
     for letter in end_list: # Browsing all games pages starting with a specific caracter in end_list 
@@ -389,17 +494,20 @@ def scrap_canyourunit():
                 table=element_to_scrape.text
                 result = [line.split(": ") for line in table.split("\n")[:4]]
                 data_dict={}
-                dict = {item[0]: item[1] for item in result}
+                try:
+                    dict = {item[0]: item[1] for item in result}
+                    data_dict['Title'] = title
+                    if 'CPU' in dict.keys():
+                        data_dict['CPU']=dict['CPU'] 
+                    if 'VIDEO CARD' in dict.keys():
+                        data_dict['GPU']=dict['VIDEO CARD']
+                    if 'RAM' in dict.keys():
+                        data_dict['RAM']=dict['RAM']
 
-                data_dict['Title'] = title
-                if 'CPU' in dict.keys():
-                    data_dict['CPU']=dict['CPU'] 
-                if 'VIDEO CARD' in dict.keys():
-                    data_dict['GPU']=dict['VIDEO CARD']
-                if 'RAM' in dict.keys():
-                    data_dict['RAM']=dict['RAM']
+                    requirements_list.append(data_dict)
 
-                requirements_list.append(data_dict)
+                except Exception:
+                    pass
 
             except NoSuchElementException:
                 pass
@@ -420,6 +528,7 @@ def scrap_canyourunit():
 def scrap_data():
     print(f"\n Creating data files . . .")
     scrap_processors()
+    scrap_graphiccards()
     scrap_canyourunit()
 
     print(f"\n>>> Downloading Boavizta data file")
