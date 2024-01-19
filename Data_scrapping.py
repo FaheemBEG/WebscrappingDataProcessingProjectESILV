@@ -16,8 +16,7 @@ import os
 
 # Root directory:
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-path="C:/Users/fahee/Desktop/ETUDE/s9/WebscrappingDataProcessingProjectESILV/_data"
+path=f"{ROOT_DIR}/_data"
 
 def scrap_processors_en():
     
@@ -248,7 +247,7 @@ def scrap_graphiccards(path:str=path):
 
     df_gc.to_csv(f"{path}/gpu.csv",index=False)
 
-    print(f"\Graphic cards list data file successfuly created !")
+    print(f"\nGraphic cards list data file successfuly created !")
     return
 
 def scrap_howlongtobbeat():
@@ -337,7 +336,7 @@ def scrap_howlongtobbeat():
             try:
                 games_data={}
                 games_data["Title"]=title
-                print(title)
+                # print(title)
                 # Waiting for the page to load
                 wait = WebDriverWait(driver, 10)
 
@@ -345,11 +344,11 @@ def scrap_howlongtobbeat():
                 try:                                                      
                     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))
                     main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
-                    print("Main Story found")                            
+                    # print("Main Story found")                            
                 except TimeoutException:
                     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')))
                     main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')
-                    print("Main Story found")
+                    # print("Main Story found")
                 
                 driver.execute_script("arguments[0].scrollIntoView();", main_story_time_element)
                 table=main_story_time_element.text.strip()
@@ -359,7 +358,7 @@ def scrap_howlongtobbeat():
                 except Exception:
                     mainstory = table.partition("Main Story")[2].strip()
                 games_data["Main Story (Hours)"]=mainstory
-                print("Main Story scrapped")
+                # print("Main Story scrapped")
 
 
                 # Scrapping plateform
@@ -368,7 +367,7 @@ def scrap_howlongtobbeat():
                 table=plateform_element.text.strip()
                 plateform = table.partition("Platforms:")[2].strip()
                 games_data["Platforms"]=plateform
-                print("Platforms scrapped")
+                # print("Platforms scrapped")
 
                 # Scrapping genres
                 genres_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]')
@@ -376,7 +375,7 @@ def scrap_howlongtobbeat():
                 table=genres_element.text.strip()
                 genres = table.partition("Genres:")[2].strip()
                 games_data["Genres"]=genres
-                print("Genres scrapped")
+                # print("Genres scrapped")
 
                 print(games_data)
                 games_list.append(games_data)
@@ -423,14 +422,12 @@ def scrap_howlongtobbeat():
 
     return df_games
 
-def scrap_canyourunit():
-
-    df=scrap_howlongtobbeat()
+def scrap_canyourunit(df):
 
     # WORK IN PROGRESS
     print(f"\n>>> Scrapping games system requirements from the CanYouRunIt website ...")
 
-    max=1000 #maximum number of games to scrap per page. Default 1000
+    max=30 #maximum number of games to scrap per page. Default 1000
 
     # Chrome options
     chrome_options = Options()
@@ -529,7 +526,15 @@ def scrap_data():
     print(f"\n Creating data files . . .")
     scrap_processors()
     scrap_graphiccards()
-    scrap_canyourunit()
+
+    try:
+        scrap_canyourunit(df_games)
+    except Exception:
+        print("\nError while scarpping CanYouRunIt website")
+        df_games=scrap_howlongtobbeat()
+        df_games.to_csv(f"{path}/games.csv",index=False)
+        print(f"\nGames data file successfuly created !")
+
 
     print(f"\n>>> Downloading Boavizta data file")
     if os.path.exists(f"{path}/boavizta-data.csv"):
