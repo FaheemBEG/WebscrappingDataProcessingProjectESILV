@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de Données de Jeux Vidéo avec Impact Carbone</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<div class="navbar">
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Rechercher...">
+        <button onclick="searchGames()">Rechercher</button>
+    </div>
+    <div class="dropdown">
+        <button class="dropbtn">Plateforme</button>
+        <div class="dropdown-content">
+            <a href="#">PC</a>
+            <a href="#">Console</a>
+        </div>
+    </div>
+    <div class="dropdown">
+        <button class="dropbtn">Pays</button>
+        <div class="dropdown-content">
+            <a href="#">Tous les pays</a>
+            <!-- Ajoutez ici les options pour chaque pays -->
+        </div>
+    </div>
+</div>
+<h2>Tableau de Données de Jeux Vidéo avec Impact Carbone</h2>
+<table class="main-table">
+    <tbody id="data-table-body">
+    <!-- Les lignes de données seront insérées ici -->
+    </tbody>
+</table>
+<script src="script.js"></script>
+</body>
+</html>
