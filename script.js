@@ -52,7 +52,7 @@ function loadJSON(file) {
     xhr.send();
 }
 
-loadJSON('data/games_full_2.json');
+loadJSON('_data/games_full_2.json');
 
 
 
