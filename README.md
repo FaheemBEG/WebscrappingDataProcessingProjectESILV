@@ -16,6 +16,6 @@ Data files will be created into the `_data` folder
 Note:
     An extract of full dataset is also available in `_data` folder, so that you don't need to run run `Data_scrapping.py` adn wait your dataset to be downloaded
 
-To display the website, execute in your terminal : python -m http.server
-Then in your browser, enter : http://localhost:8000/
+To display the website, execute in your terminal : `python -m http.server`
+Then in your browser, enter : `http://localhost:8000/`
 The website should display.
