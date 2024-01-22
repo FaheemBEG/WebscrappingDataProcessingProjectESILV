@@ -1,2 +1,8 @@
 *.csv
 *.json
+
+# Except
+!games.csv
+!gpu.csv
+!processors.csv
+!boavizta_data.csv
