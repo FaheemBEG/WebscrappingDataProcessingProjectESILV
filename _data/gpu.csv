@@ -1,0 +1,879 @@
+Model,TDP (Watts)
+STG-2000,
+Riva 128,
+Riva 128ZX,
+Riva TNT,
+Vanta,
+Vanta LT,
+Riva TNT2 M64,
+Riva TNT2,
+Riva TNT2 Pro,
+Riva TNT2 Ultra,
+GeForce 256 SDR,
+GeForce 256 DDR,
+GeForce2 MX IGP + nForce 220/420,
+GeForce2 MX200,
+GeForce2 MX,
+GeForce2 MX400,
+GeForce2 GTS,
+GeForce2 Pro,
+GeForce2 Ti,
+GeForce2 Ultra,
+GeForce3 Ti200,
+GeForce3,
+GeForce3 Ti500,
+GeForce4 MX IGP + nForce2,
+GeForce4 MX420,
+GeForce4 MX440 SE,
+GeForce MX4000,
+GeForce PCX4300,
+GeForce4 MX440,
+GeForce4 MX440 8x,
+GeForce4 MX460,
+GeForce4 Ti4200,
+GeForce4 Ti4200 8x,
+GeForce4 Ti4400,
+GeForce4 Ti4400 8x (Ti4800SE,
+GeForce4 Ti4600,
+GeForce4 Ti4600 8x (Ti4800,
+GeForce4 MX420,
+GeForce4 MX440 SE,
+GeForce4 MX4000,
+GeForce4 PCX4300,
+GeForce4 MX440,
+GeForce4 MX440 8X,
+GeForce4 MX460,
+GeForce4 Ti4200,
+GeForce4 Ti4200 8x,
+GeForce4 Ti4400,
+GeForce4 Ti4400 8x,
+GeForce4 Ti4600,
+GeForce4 Ti4600 8x,
+GeForce FX 5100,
+GeForce FX 5200 LE,
+GeForce FX 5200,
+GeForce FX 5200 Ultra,
+GeForce PCX 5300,
+GeForce FX 5500,
+GeForce FX 5600 XT,
+GeForce FX 5600,
+GeForce FX 5600 Ultra,
+GeForce FX 5600 Ultra Rev.2,
+GeForce FX 5700 VE,
+GeForce FX 5700 LE,
+GeForce FX 5700,
+GeForce PCX 5750,
+GeForce FX 5700 Ultra,
+GeForce FX 5700 Ultra GDDR3,
+GeForce FX 5800,
+GeForce FX 5800 Ultra,
+GeForce FX 5900 ZT,
+GeForce FX 5900 XT,
+GeForce FX 5900,
+GeForce FX 5900 Ultra,
+GeForce PCX 5900,
+GeForce FX 5950 Ultra,
+GeForce PCX 5950,
+GeForce 6100 + nForce 410,
+GeForce 6150 SE + nForce 430,
+GeForce 6150 LE + nForce 430,
+GeForce 6150 + nForce 430,
+GeForce 6200 LE,
+GeForce 6200A,
+GeForce 6200,
+GeForce 6200 TurboCache,
+GeForce 6500,
+GeForce 6600 LE,
+GeForce 6600,
+GeForce 6600 GT,
+GeForce 6800 LE,
+GeForce 6800 XT,
+GeForce 6800,
+GeForce 6800 GTO,
+GeForce 6800 GS,
+GeForce 6800 GT,
+GeForce 6800 Ultra,
+GeForce 6800 Ultra Extreme Edition,
+GeForce 6100,
+GeForce 6150 SE,
+GeForce 6150,
+GeForce 6150 LE,
+GeForce 6200,
+GeForce 6500,
+GeForce 6600 LE,
+GeForce 6600,
+GeForce 6600 DDR2,
+GeForce 6600 GT,
+GeForce 6800 LE,
+GeForce 6800 XT,
+GeForce 6800,
+GeForce 6800 GTO,
+GeForce 6800 GS,
+GeForce 6800 GT,
+GeForce 6800 Ultra,
+GeForce 7025 + nForce 630a,
+GeForce 7050PV + nForce 630a,
+GeForce 7050 + nForce 610i/630i,
+GeForce 7100 + nForce 630i,
+GeForce 7150 + nForce 630i,
+GeForce 7100 GS,
+GeForce 7200 GS,
+GeForce 7300 SE,
+GeForce 7300 LE,
+GeForce 7300 GS,
+GeForce 7300 GT,
+GeForce 7500 LE,
+GeForce 7600 GS,
+GeForce 7600 GT,
+GeForce 7600 GT 80 nm,
+GeForce 7650 GS,
+GeForce 7800 GS,
+GeForce 7800 GT,
+GeForce 7800 GTX,
+GeForce 7900 GS,
+GeForce 7900 GT,
+GeForce 7900 GTO,
+GeForce 7900 GTX,
+GeForce 7900 GX2,
+GeForce 7950 GT,
+GeForce 7950 GX2,
+GeForce 7100 GS,
+GeForce 7200 GS,
+GeForce 7300 SE,
+GeForce 7300 LE,
+GeForce 7300 GS,
+GeForce 7300 GT,
+GeForce 7600 GS,
+GeForce 7600 GT,
+GeForce 7600 GT (80 nm),
+GeForce 7650 GS (80 nm),
+GeForce 7800 GS,
+GeForce 7800 GT,
+GeForce 7800 GTX,
+GeForce 7800 GTX 512,
+GeForce 7900 GS,
+GeForce 7900 GT,
+GeForce 7900 GTO,
+GeForce 7900 GTX,
+GeForce 7900 GX2 (GTX Duo),
+GeForce 7950 GT,
+GeForce 7950 GX2,
+GeForce 8100 mGPU,
+GeForce 8200 mGPU,
+GeForce 8300 mGPU,
+GeForce 8300 GS,40.0
+GeForce 8400 GS,40.0
+GeForce 8400 GS rev.2,25.0
+GeForce 8400 GS rev.3,25.0
+GeForce 8500 GT,45.0
+GeForce 8600 GS,47.0
+GeForce 8600 GT,47.0
+GeForce 8600 GTS,71.0
+GeForce 8800 GS,105.0
+GeForce 8800 GTS (G80),146.0
+GeForce 8800 GTS 112 (G80),150.0
+GeForce 8800 GT,125.0
+GeForce 8800 GTS (G92),135.0
+GeForce 8800 GTX,145.0
+GeForce 8800 Ultra,175.0
+GeForce 8300 GS (G86),
+GeForce 8400 GS Rev. 2 (G98),
+GeForce 8400 GS Rev. 3 (GT218),
+GeForce 8500 GT,
+GeForce 8600 GT,
+GeForce 8600 GTS,
+GeForce 8800 GS (G92),
+GeForce 8800 GTS (G80),
+GeForce 8800 GTS Rev. 2 (G80),
+GeForce 8800 GT (G92),
+GeForce 8800 GTS (G92),
+GeForce 8800 GTX,
+GeForce 8800 Ultra,
+GeForce 9300 mGPU,
+GeForce 9400 mGPU,12.0
+GeForce 9300 GE,25.0
+GeForce 9300 GS,25.0
+GeForce 9400 GT,50.0
+GeForce 9500 GS,50.0
+GeForce 9500 GT,50.0
+GeForce 9600 GS,
+GeForce 9600 GSO,84.0
+GeForce 9600 GSO 512,90.0
+GeForce 9600 GT Green Edition,59.0
+GeForce 9600 GT,95.0
+GeForce 9800 GT Green Edition,75.0
+GeForce 9800 GT,125.0
+GeForce 9800 GTX,140.0
+GeForce 9800 GTX+,141.0
+GeForce 9800 GX2,197.0
+GeForce 9300 GE (G98),
+GeForce 9300 GS (G98),
+GeForce 9400 GT,
+GeForce 9500 GT,
+GeForce 9600 GSO,
+GeForce 9600 GT,
+GeForce 9800 GT,
+GeForce 9800 GTX,
+GeForce 9800 GTX+,
+GeForce 9800 GX2,
+GeForce G 100,35.0
+GeForce GT 120,50.0
+GeForce GT 130,75.0
+GeForce GT 140,105.0
+GeForce GTS 150,141.0
+GeForce 205,30.0
+GeForce 210,30.0
+GeForce GT 220,58.0
+GeForce GT 230,75.0
+GeForce GT 230,75.0
+GeForce GT 240,69.0
+GeForce GTS 240,120.0
+GeForce GTS 250,130.0
+GeForce GTS 250,150.0
+GeForce GTX 260,182.0
+GeForce GTX 260,182.0
+GeForce GTX 275,219.0
+GeForce GTX 280,236.0
+GeForce GTX 285,204.0
+GeForce GTX 295,289.0
+GeForce 210,
+GeForce GT 220,
+GeForce GT 240,
+GeForce GTS 250,
+GeForce GTX 260,
+GeForce GTX 260 Core 216,
+GeForce GTX 260 Core 216 (55 nm),
+GeForce GTX 275,
+GeForce GTX 280,
+GeForce GTX 285,
+GeForce GTX 295,
+GeForce 310,30.0
+GeForce 315,33.0
+GeForce GT 320,43.0
+GeForce GT 330,75.0
+GeForce GT 330,75.0
+GeForce GT 330,75.0
+GeForce GT 340,69.0
+GeForce 405,
+GeForce GT 420,
+GeForce GT 430,
+GeForce GT 430,
+GeForce GT 430,
+GeForce GT 440,
+GeForce GT 440,
+GeForce GTS 450,
+GeForce GTS 450,
+GeForce GTX 460 SE,
+GeForce GTX 460,
+GeForce GTX 460,
+GeForce GTX 460,
+GeForce GTX 460,
+GeForce GTX 465,
+GeForce GTX 470,
+GeForce GTX 480,
+GeForce 510,
+GeForce GT 520,
+GeForce GT 530,
+GeForce GT 545,
+GeForce GT 545,
+GeForce GTX 550 Ti,
+GeForce GTX 555,
+GeForce GTX 560 SE,
+GeForce GTX 560,
+GeForce GTX 560 Ti,
+GeForce GTX 560 Ti,
+GeForce GTX 560 Ti 448 Cores,
+GeForce GTX 570,
+GeForce GTX 580,
+GeForce GTX 590,
+GeForce 605,25.0
+GeForce GT 610,29.0
+GeForce GT 620,30.0
+GeForce GT 620,49.0
+GeForce GT 625,30.0
+GeForce GT 630,50.0
+GeForce GT 630,49.0
+GeForce GT 630,65.0
+GeForce GT 630,25.0
+GeForce GT 635,35.0
+GeForce GT 640,75.0
+GeForce GT 640,50.0
+GeForce GT 640,65.0
+GeForce GT 640,75.0
+GeForce GT 640,49.0
+GeForce GT 645,140.0
+GeForce GTX 645,64.0
+GeForce GTX 650,64.0
+GeForce GTX 650,
+GeForce GTX 650 Ti,110.0
+GeForce GTX 650 Ti Boost,134.0
+GeForce GTX 660,140.0
+GeForce GTX 660,130.0
+GeForce GTX 660 Ti,150.0
+GeForce GTX 670,170.0
+GeForce GTX 680,195.0
+GeForce GTX 690,300.0
+GeForce GT 705,29.0
+GeForce GT 710,19.0
+GeForce GT 720,19.0
+GeForce GT 730 ,23.0
+GeForce GT 730 ,25.0
+GeForce GT 730 ,49.0
+GeForce GT 740,64.0
+GeForce GT 740,64.0
+GeForce GTX 745,55.0
+GeForce GTX 750,55.0
+GeForce GTX 750 Ti,60.0
+GeForce GTX 760 192-bit,130.0
+GeForce GTX 760,170.0
+GeForce GTX 760 Ti,170.0
+GeForce GTX 770,230.0
+GeForce GTX 780,230.0
+GeForce GTX 780 Ti,230.0
+GeForce GTX TITAN,230.0
+GeForce GTX TITAN Black,230.0
+GeForce GTX TITAN Z,375.0
+GeForce GT 945A,33.0
+GeForce GTX 950,90.0
+GeForce GTX 950 (OEM),
+GeForce GTX 960,120.0
+GeForce GTX 960 (OEM),
+GeForce GTX 970,145.0
+GeForce GTX 980,165.0
+GeForce GTX 980 Ti,250.0
+GeForce GTX TITAN X,250.0
+GeForce GT 1010 ,30.0
+GeForce GT 1010 ,20.0
+GeForce GT 1030 ,20.0
+GeForce GT 1030 ,30.0
+GeForce GTX 1050,75.0
+GeForce GTX 1050,75.0
+GeForce GTX 1050 Ti,75.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1060 ,120.0
+GeForce GTX 1070,150.0
+GeForce GTX 1070 Ti,180.0
+GeForce GTX 1080,180.0
+GeForce GTX 1080,180.0
+GeForce GTX 1080 Ti,250.0
+TITAN X Pascal,250.0
+TITAN Xp,250.0
+Nvidia TITAN V,250.0
+Nvidia TITAN V CEO Edition,250.0
+GeForce GTX 1630,75.0
+GeForce GTX 1650,75.0
+GeForce GTX 1650,75.0
+GeForce GTX 1650,90.0
+GeForce GTX 1650 Super,100.0
+GeForce GTX 1660,120.0
+GeForce GTX 1660 Super,125.0
+GeForce GTX 1660 Ti,120.0
+GeForce RTX 2060,160.0
+GeForce RTX 2060,160.0
+GeForce RTX 2060,185.0
+GeForce RTX 2060 Super,175.0
+GeForce RTX 2070,175.0
+GeForce RTX 2070 Super,215.0
+GeForce RTX 2080,215.0
+GeForce RTX 2080 Super,250.0
+GeForce RTX 2080 Ti,250.0
+Nvidia TITAN RTX,280.0
+GeForce RTX 3050,115.0
+GeForce RTX 3050,130.0
+GeForce RTX 3060,170.0
+GeForce RTX 3060,170.0
+GeForce RTX 3060,170.0
+GeForce RTX 3060,170.0
+GeForce RTX 3060 Ti,200.0
+GeForce RTX 3060 Ti,200.0
+GeForce RTX 3070,220.0
+GeForce RTX 3070 Ti,290.0
+GeForce RTX 3080,320.0
+GeForce RTX 3080,350.0
+GeForce RTX 3080 Ti,350.0
+GeForce RTX 3090,350.0
+GeForce RTX 3090 Ti,450.0
+GeForce RTX 4060,115.0
+GeForce RTX 4060 Ti,160.0
+GeForce RTX 4060 Ti,160.0
+GeForce RTX 4070,200.0
+GeForce RTX 4070 Super,220.0
+GeForce RTX 4070 Ti,285.0
+GeForce RTX 4070 Ti Super,285.0
+GeForce RTX 4080,285.0
+GeForce RTX 4080,320.0
+GeForce RTX 4080 Super ,320.0
+GeForce RTX 4090D,425.0
+GeForce RTX 4090,450.0
+GeForce2 Go 100,
+GeForce2 Go,
+GeForce2 Go 200,
+GeForce4 Go 410,
+GeForce4 Go 420,
+GeForce4 Go 440,
+GeForce4 Go 460,
+GeForce4 Go 488,
+GeForce4 Go 4200,
+GeForce FX Go 5100*,
+GeForce FX Go 5500*,
+GeForce FX Go 5600*,
+GeForce FX Go 5650*,
+GeForce FX Go 5700*,
+GeForce Go 6100 + nForce Go 430,
+GeForce Go 6150 + nForce Go 430,
+GeForce Go 6200,
+GeForce Go 6400,
+GeForce Go 6600,
+GeForce Go 6800,
+GeForce Go 6800 Ultra,
+GeForce 7000M,
+GeForce 7150M,
+GeForce Go 72002,
+GeForce Go 73002,
+GeForce Go 74002,
+GeForce Go 7600,
+GeForce Go 7600 GT,
+GeForce Go 7700,
+GeForce Go 7800,35.0
+GeForce Go 7800 GTX,65.0
+GeForce Go 7900 GS,20.0
+GeForce Go 7900 GTX,45.0
+GeForce Go 7950 GTX,45.0
+GeForce 8200M G,
+GeForce 8400M G,10.0
+GeForce 8400M GS,11.0
+GeForce 8400M GT,14.0
+GeForce 8600M GS,20.0
+GeForce 8600M GT,20.0
+GeForce 8700M GT,29.0
+GeForce 8800M GTS,50.0
+GeForce 8800M GTX,65.0
+GeForce 9100M G mGPU,12.0
+GeForce 9200M GS,13.0
+GeForce 9300M G,13.0
+GeForce 9300M GS,13.0
+GeForce 9400M G,12.0
+GeForce 9500M G,20.0
+GeForce 9500M GS,20.0
+GeForce 9600M GS,20.0
+GeForce 9600M GT,23.0
+GeForce 9650M GS,29.0
+GeForce 9650M GT,23.0
+GeForce 9700M GT,45.0
+GeForce 9700M GTS,60.0
+GeForce 9800M GS,60.0
+GeForce 9800M GTS,75.0
+GeForce 9800M GT,65.0
+GeForce 9800M GTX,75.0
+GeForce G 102M,14.0
+GeForce G 103M,14.0
+GeForce G 105M,14.0
+GeForce G 110M,14.0
+GeForce GT 120M,23.0
+GeForce GT 130M,23.0
+GeForce GTS 150M,
+GeForce GTS 160M,60.0
+GeForce G210M,14.0
+GeForce GT 220M,14.0
+GeForce GT 230M,23.0
+GeForce GT 240M,23.0
+GeForce GTS 250M,28.0
+GeForce GTS 260M,38.0
+GeForce GTX 260M,65.0
+GeForce GTX 280M,75.0
+GeForce GTX 285M,75.0
+GeForce 305M,14.0
+GeForce 310M,14.0
+GeForce 315M,14.0
+GeForce 320M,20.0
+GeForce GT 320M,14.0
+GeForce GT 325M,23.0
+GeForce GT 330M,23.0
+GeForce GT 335M,28.0
+GeForce GTS 350M,28.0
+GeForce GTS 360M,38.0
+GeForce 410M,12.0
+GeForce GT 415M,12.0
+GeForce GT 420M,10.0
+GeForce GT 425M,20.0
+GeForce GT 435M,32.0
+GeForce GT 445M,30.0
+GeForce GTX 460M,45.0
+GeForce GTX 470M,45.0
+GeForce GTX 480M,100.0
+GeForce GTX 485M,100.0
+GeForce GT 520M,12.0
+GeForce GT 520M,20.0
+GeForce GT 520MX,20.0
+GeForce GT 525M,20.0
+GeForce GT 540M,32.0
+GeForce GT 550M,32.0
+GeForce GT 555M,30.0
+GeForce GTX 560M,75.0
+GeForce GTX 570M,75.0
+GeForce GTX 580M,100.0
+GeForce 610M,12.0
+GeForce GT 620M,15.0
+GeForce GT 625M,15.0
+GeForce GT 630M,33.0
+GeForce GT 635M,35.0
+GeForce GT 640M LE,32.0
+GeForce GT 640M,32.0
+GeForce GT 645M,32.0
+GeForce GT 650M,45.0
+GeForce GTX 660M,50.0
+GeForce GTX 670M,75.0
+GeForce GTX 670MX,75.0
+GeForce GTX 675M,100.0
+GeForce GTX 675MX,100.0
+GeForce GTX 680M,100.0
+GeForce GTX 680MX,122.0
+GeForce 710M,12.0
+GeForce 710M,15.0
+GeForce GT 720M,
+GeForce GT 720M,22.0
+GeForce GT 730M,33.0
+GeForce GT 735M,
+GeForce GT 740M,
+GeForce GT 740M,45.0
+GeForce GT 745M,45.0
+GeForce GT 750M,50.0
+GeForce GT 755M,50.0
+GeForce GTX 760M,55.0
+GeForce GTX 765M,65.0
+GeForce GTX 770M,75.0
+GeForce GTX 780M,122.0
+GeForce 810M,15.0
+GeForce 820M,15.0
+GeForce 825M,33.0
+GeForce 830M,25.0
+GeForce 840M,30.0
+GeForce 845M,33.0
+GeForce 845M,45.0
+GeForce GTX 850M,40.0
+GeForce GTX 850M,40.0
+GeForce GTX 860M,40.0
+GeForce GTX 860M,75.0
+GeForce GTX 870M,110.0
+GeForce GTX 880M,130.0
+GeForce 910M,33.0
+GeForce 920M,33.0
+GeForce 930M,29.0
+GeForce 940M,36.0
+GeForce 940MX,23.0
+GeForce 940MX,23.0
+GeForce GTX 950M,
+GeForce GTX 950M,55.0
+GeForce GTX 960M,65.0
+GeForce GTX 965M,60.0
+GeForce GTX 970M,75.0
+GeForce GTX 980M,100.0
+GeForce GTX 980,165.0
+GeForce GTX 1050 (Notebook),53.0
+GeForce GTX 1050 Ti (Notebook),64.0
+GeForce GTX 1060 (Notebook),80.0
+GeForce GTX 1060 Max-Q,80.0
+GeForce GTX 1060 Max-Q,80.0
+GeForce GTX 1070 (Notebook),115.0
+GeForce GTX 1070 Max-Q,
+GeForce GTX 1080 (Notebook),150.0
+GeForce GTX 1080 Max-Q,
+Geforce GTX 1630,75.0
+GeForce GTX 1650 (Laptop),50.0
+GeForce GTX 1650 Max-Q,30.0
+GeForce GTX 1650 Ti Max-Q,35.0
+GeForce GTX 1650 Ti,55.0
+GeForce GTX 1660 (Laptop),
+GeForce GTX 1660 Ti Max-Q,60.0
+GeForce GTX 1660 Ti (Laptop),80.0
+GeForce RTX 2050,30.0
+GeForce RTX 2060,80.0
+GeForce RTX 2060 Max-Q,65.0
+GeForce RTX 2070,115.0
+GeForce RTX 2070 Max-Q,80.0
+GeForce RTX 2070 Super,115.0
+GeForce RTX 2070 Super Max-Q,80.0
+GeForce RTX 2080,150.0
+GeForce RTX 2080 Max-Q,80.0
+GeForce RTX 2080 Super,150.0
+GeForce RTX 2080 Super Max-Q,80.0
+GeForce RTX 3050,35.0
+GeForce RTX 3050 Ti,35.0
+GeForce RTX 3060,60.0
+GeForce RTX 3070,80.0
+GeForce RTX 3070 Ti,80.0
+GeForce RTX 3080,80.0
+GeForce RTX 3080 Ti Mobile,80.0
+GeForce RTX 4050,35.0
+GeForce RTX 4060,35.0
+GeForce RTX 4070,35.0
+GeForce RTX 4080,60.0
+GeForce RTX 4090,80.0
+Quadro FX 4000,142.0
+Quadro FX 330,21.0
+Quadro FX 1300,55.0
+Quadro FX 540,35.0
+Quadro FX 1400,75.0
+Quadro FX 3400,101.0
+Quadro FX 3450,83.0
+Quadro FX 4400,110.0
+Quadro FX 350,21.0
+Quadro FX 550,30.0
+Quadro FX 1500,65.0
+Quadro FX 3500,80.0
+Quadro FX 4500,109.0
+Quadro FX 4500 SDI,116.0
+Quadro FX 4500X2,145.0
+Quadro FX 4500 rev. A2,105.0
+Quadro FX 5500,96.0
+Quadro FX 5500 SDI,104.0
+Quadro FX 560,30.0
+Quadro FX 46002,134.0
+Quadro FX 4600 SDI2,154.0
+Quadro FX 56002,171.0
+Quadro FX 370,35.0
+Quadro FX 370 LP,25.0
+Quadro FX 470,30.0
+Quadro FX 570,38.0
+Quadro FX 1700,42.0
+Quadro FX 3700,78.0
+Quadro FX 4700X2,226.0
+Quadro VX 200,75.0
+Quadro FX 380,34.0
+Quadro FX 380 LP,28.0
+Quadro FX 580,40.0
+Quadro FX 1800,59.0
+Quadro FX 3800,108.0
+Quadro FX 4800,150.0
+Quadro FX 5800,189.0
+Quadro CX,150.0
+Quadro 400,32.0
+Quadro 600,40.0
+Quadro 2000,62.0
+Quadro 4000,142.0
+Quadro 5000,152.0
+Quadro 6000,204.0
+Quadro 7000,204.0
+Quadro Plex 7000,600.0
+Quadro 410,38.0
+Quadro K600,41.0
+Quadro K2000,51.0
+Quadro K2000D,51.0
+Quadro K4000,80.0
+Quadro K5000,122.0
+Quadro K6000,225.0
+Quadro K420,41.0
+Quadro K620,45.0
+Quadro K1200,45.0
+Quadro K2200,68.0
+Quadro K4200,105.0
+Quadro K5200,150.0
+Quadro M2000,75.0
+Quadro M4000,120.0
+Quadro M5000,150.0
+Quadro M6000,250.0
+Quadro P400,30.0
+Quadro P600,40.0
+Quadro P620,40.0
+Quadro P1000,47.0
+Quadro P2000,75.0
+Quadro P2200,75.0
+Quadro P4000,105.0
+Quadro P5000,180.0
+Quadro P6000,250.0
+Quadro GP100,235.0
+Quadro GV100,250.0
+NVIDIA T400 ,30.0
+NVIDIA T600 ,40.0
+NVIDIA T1000 ,50.0
+Quadro RTX 4000,100.0
+Quadro RTX 5000,125.0
+Quadro RTX 6000,100.0
+Quadro RTX 8000,100.0
+RTX A2000 ,70.0
+RTX A2000 ,70.0
+RTX A4000 ,140.0
+RTX A4500 ,200.0
+RTX A5000 ,230.0
+RTX A5500 ,230.0
+RTX A6000 ,300.0
+RTX 4000 SFF Ada Generation,70.0
+RTX 4000 Ada Generation,130.0
+RTX 4500 Ada Generation,210.0
+RTX 5000 Ada Generation,250.0
+RTX 6000 Ada Generation,300.0
+NVS 280,13.0
+NVS 285,18.0
+NVS 290,21.0
+NVS 295,23.0
+NVS 300,17.0
+NVS 310,19.0
+NVS 315,19.0
+NVS 400,18.0
+NVS 420,40.0
+NVS 440,31.0
+NVS 450,35.0
+NVS 510,35.0
+NVS 810,68.0
+Quadro FX 350M,15.0
+Quadro FX 1500M,15.0
+Quadro FX 2500M,15.0
+Quadro FX 3500M,15.0
+Quadro FX 360M,17.0
+Quadro FX 560M,35.0
+Quadro FX 1600M,50.0
+Quadro FX 3600M,70.0
+Quadro FX 370M,20.0
+Quadro FX 570M,45.0
+Quadro FX 770M,35.0
+Quadro FX 1700M,50.0
+Quadro FX 2700M,65.0
+Quadro FX 3700M,75.0
+Quadro FX 380M,25.0
+Quadro FX 880M,35.0
+Quadro FX 1800M,45.0
+Quadro FX 2800M,75.0
+Quadro FX 3800M,100.0
+Quadro 500M,35.0
+Quadro 1000M,45.0
+Quadro 2000M,55.0
+Quadro 3000M,75.0
+Quadro 4000M,100.0
+Quadro 5000M,100.0
+Quadro 5010M,100.0
+Quadro K500M,35.0
+Quadro K1000M,45.0
+Quadro K2000M,55.0
+Quadro K3000M,75.0
+Quadro K4000M,100.0
+Quadro K5000M,100.0
+Quadro K510M,30.0
+Quadro K610M,30.0
+Quadro K1100M,45.0
+Quadro K2100M,55.0
+Quadro K3100M,75.0
+Quadro K4100M,100.0
+Quadro K5100M,100.0
+Quadro K2200M,65.0
+Quadro M500M,25.0
+Quadro M600M,30.0
+Quadro M1000M,40.0
+Quadro M2000M,55.0
+Quadro M3000M,75.0
+Quadro M4000M,100.0
+Quadro M5000M,100.0
+Quadro M520,25.0
+Quadro M620,30.0
+Quadro M1200,45.0
+Quadro M2200,55.0
+Quadro M5500,150.0
+Quadro P500,18.0
+Quadro P600,25.0
+Quadro P1000,40.0
+Quadro P2000,50.0
+Quadro P3000,75.0
+Quadro P4000,100.0
+Quadro P4000 Max-Q,80.0
+Quadro P5000,100.0
+Quadro P3200,78.0
+Quadro P4200,115.0
+Quadro P5200,150.0
+Quadro T1000,40.0
+Quadro T2000,60.0
+Quadro T2000 Max-Q,40.0
+Quadro RTX 3000,60.0
+Quadro RTX 3000 Max-Q,60.0
+Quadro RTX 4000,110.0
+Quadro RTX 4000 Max-Q,80.0
+Quadro RTX 5000,110.0
+Quadro RTX 5000 Max-Q,80.0
+RTX A500,60.0
+RTX A1000,95.0
+RTX A1000 6GB,95.0
+RTX A2000,95.0
+RTX A2000 8GB,95.0
+RTX A3000,130.0
+RTX A3000 12GB,130.0
+RTX A4000,140.0
+RTX A4500,140.0
+RTX A5000,165.0
+RTX A5500,165.0
+RTX 2000 Ada Generation,35.0
+RTX 3000 Ada Generation,35.0
+RTX 3500 Ada Generation,60.0
+RTX 4000 Ada Generation,60.0
+RTX 5000 Ada Generation,60.0
+Quadro NVS 110M,10.0
+Quadro NVS 120M,10.0
+Quadro NVS 130M,10.0
+Quadro NVS 135M,10.0
+Quadro NVS 140M,10.0
+Quadro NVS 150M,10.0
+Quadro NVS 160M,12.0
+Quadro NVS 300M,16.0
+Quadro NVS 320M,20.0
+Quadro NVS 510M,45.0
+NVS 2100M,14.0
+NVS 3100M,14.0
+NVS 5100M,35.0
+NVS 5200M,35.0
+NVS 5400M,35.0
+GRID K1,130.0
+GRID K2,225.0
+GRID K340,225.0
+GRID K520,225.0
+C870 GPU Computing Module,170.0
+D870 Deskside Computer,520.0
+C1060 GPU Computing Module,187.0
+"S1070 GPU Computing Server ""400 configuration""",800.0
+"S1070 GPU Computing Server ""500 configuration""",800.0
+Quadro Plex 2200 S4 Visual Computing System,1200.0
+C2050 GPU Computing Module,247.0
+M2050 GPU Computing Module,225.0
+C2070 GPU Computing Module,247.0
+C2075 GPU Computing Module,225.0
+M2070/M2070Q GPU Computing Module,225.0
+M2090 GPU Computing Module,225.0
+S2050 GPU Computing Server,900.0
+S2070 GPU Computing Server,900.0
+K10 GPU accelerator,225.0
+K20 GPU accelerator,225.0
+K20X GPU accelerator,235.0
+K40 GPU accelerator,235.0
+K80 GPU accelerator,300.0
+M4 GPU accelerator,50.0
+M6 GPU accelerator,75.0
+M10 GPU accelerator,225.0
+M40 GPU accelerator,250.0
+M60 GPU accelerator,225.0
+P4 GPU accelerator,50.0
+P6 GPU accelerator,90.0
+P40 GPU accelerator,250.0
+P100 GPU accelerator (mezzanine),300.0
+P100 GPU accelerator (16 GB card),250.0
+P100 GPU accelerator (12 GB card),250.0
+V100 GPU accelerator (mezzanine),300.0
+V100 GPU accelerator (PCIe card),250.0
+V100 GPU accelerator (PCIe FHHL card),250.0
+T4 GPU accelerator (PCIe card),70.0
+A2 GPU accelerator (PCIe card),40.0
+A10 GPU accelerator (PCIe card),150.0
+A16 GPU accelerator (PCIe card),250.0
+A30 GPU accelerator (PCIe card),165.0
+A40 GPU accelerator (PCIe card),300.0
+A100 GPU accelerator (PCIe card),250.0
+H100 GPU accelerator (PCIe card),350.0
+H100 GPU accelerator (SXM card),700.0
+GH200 Superchip (SXM card),450.0
+L40 GPU accelerator,300.0
+L4 GPU accelerator,72.0
+XGPU (Xbox) ,
+RSX (PS3) ,
+NX-SoC (Nintendo Switch) ,
+NX-SoC (Nintendo Switch) ,
+Maybe custom Orin,
