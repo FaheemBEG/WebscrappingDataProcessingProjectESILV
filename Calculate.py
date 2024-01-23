@@ -1,14 +1,22 @@
 import pandas as pd
 import os
+from database.database import clean_games_dataframe
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 path=ROOT_DIR+"/_data"
 
 def calculate_consumption(game_title:str,plateform:str):
 
-    df_games=pd.read_csv(path+"/games.csv")
-    games_data=df_games[df_games["Title"]==game_title]
+    df_games=clean_games_dataframe(pd.read_csv(path+"/games.csv"))
 
+    try:
+        games_data=df_games[df_games["Title"]==game_title]
+    except Exception as e:
+        print(e)
+        return -1
+    
+    print(games_data)
+    
     ### Default values
 
     gametime=15 
@@ -31,12 +39,17 @@ def calculate_consumption(game_title:str,plateform:str):
     box_co2=34           # Source : Boavizta
     ram_co2=11           # Source : Boavizta
 
-    
+    ## Values according to game and plateform
 
-    Total_power=TDP_powersupply+TDP_graphic_card+TDP_screen+TDP_harddrive+TDP_processor
-    print(f"Puissance totale : {Total_power} W")
+    # if type(games_data["Main Story (Hours)"])
 
-    kWh=round(Total_power*time/1000)
-    TDP_light=40
-    TDP_light/1000
-    light_time=round((kWh*1000/TDP_light)/24) #In days
+    # Total_power=TDP_powersupply+TDP_graphic_card+TDP_screen+TDP_harddrive+TDP_processor
+    # print(f"Puissance totale : {Total_power} W")
+
+    # kWh=round(Total_power*time/1000)
+    # TDP_light=40
+    # TDP_light/1000
+    # light_time=round((kWh*1000/TDP_light)/24) #In days
+
+
+calculate_consumption("A Plague Tale: Innocence","PC")

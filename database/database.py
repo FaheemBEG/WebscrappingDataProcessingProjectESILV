@@ -42,3 +42,15 @@ def connect_to_database():
     print(f"\nSuccessfuly connected to dabase : {db_path}")
 
     return conn
+
+import pandas as pd
+
+import pandas as pd
+
+def clean_games_dataframe(dataframe):
+
+    dataframe = dataframe.astype('string')
+    dataframe["Main Story (Hours)"] = pd.to_numeric(dataframe["Main Story (Hours)"].str.extract('(\d+)', expand=False), errors='coerce')
+
+    return dataframe
+
