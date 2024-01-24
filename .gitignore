@@ -1,2 +1,4 @@
 #Data files
 _data/*.csv
+_data/*.json
+test/

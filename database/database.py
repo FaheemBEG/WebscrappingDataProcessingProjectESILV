@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 import os
+import pandas as pd
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 path=ROOT_DIR+"/_data"
@@ -42,3 +43,12 @@ def connect_to_database():
     print(f"\nSuccessfuly connected to dabase : {db_path}")
 
     return conn
+
+
+def clean_games_dataframe(dataframe):
+
+    dataframe = dataframe.astype('string')
+    dataframe["Main Story (Hours)"] = pd.to_numeric(dataframe["Main Story (Hours)"].str.extract('(\d+)', expand=False), errors='coerce')
+
+    return dataframe
+

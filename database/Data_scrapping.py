@@ -14,6 +14,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import undetected_chromedriver as uc
 
 from database import connect_to_database
+
 import wget
 import os
 from csv import DictWriter
@@ -808,7 +809,7 @@ def scrap_canyourunit(games_scrapped:dict={}):
     finally:
         driver.quit()
 
-def scrap_data(bool_scrap_howlongtobeat:bool=False,bool_scrap_canyourunit:bool=False):
+def scrap_data(bool_scrap_howlongtobeat:bool=False,bool_scrap_canyourunit:bool=False):  # False by default because data already scraped in /_data
     print(f"\n Creating data files . . .")
 
     scrap_processors()
@@ -841,12 +842,19 @@ def scrap_data(bool_scrap_howlongtobeat:bool=False,bool_scrap_canyourunit:bool=F
         pass
 
     try:
+
+        games_part_1['Title'] = games_part_1['Title'].str.lower()
+        games_part_2['Title'] = games_part_2['Title'].str.lower()
+
         # Merging games data files
-        final_df = pd.merge(games_part_1, games_part_2, on='Title', how='outer', suffixes=('', '_part_2'))
+        final_df = pd.merge(games_part_2, games_part_1, on='Title', how='outer', suffixes=('', '_part_2'))
         final_df['Image'] = final_df['Image'].combine_first(final_df['Image_part_2'])
 
         # Deleting duplicated columns
         final_df.drop(['Image_part_2'], axis=1, inplace=True)
+
+        final_df['Title'] = final_df['Title'].str.capitalize()
+
         final_df.to_csv(f"{path}/games.csv",index=False)
         print(f"\nComplete games data file successfuly created !")
 
@@ -860,6 +868,7 @@ def scrap_data(bool_scrap_howlongtobeat:bool=False,bool_scrap_canyourunit:bool=F
 
     wget.download("https://raw.githubusercontent.com/Boavizta/environmental-footprint-data/main/boavizta-data-us.csv",f"{path}/boavizta_data.csv")
     print(f"\nData scrapped and data files successfuly created in : {path}")
+
 
 if __name__ == "__main__":
     scrap_data()
