@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 import os
+import pandas as pd
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 path=ROOT_DIR+"/_data"
@@ -43,9 +44,6 @@ def connect_to_database():
 
     return conn
 
-import pandas as pd
-
-import pandas as pd
 
 def clean_games_dataframe(dataframe):
 
