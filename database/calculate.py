@@ -9,7 +9,7 @@ from database import clean_games_dataframe
 ROOT_DIR =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 path=ROOT_DIR+"/_data"
 
-def calculate_consumption(game_title:str,plateform:str):
+def calculate_consumption(game_title:str,platform:str):
 
     ## Loading data files
     boavizta=pd.read_csv(path+"/boavizta_data.csv")
@@ -90,27 +90,28 @@ def calculate_consumption(game_title:str,plateform:str):
         except Exception as e:
             pass
     
-    if games_data["Platforms"].values[0]!="" and not plateform.lower() in games_data["Platforms"].values[0].lower():
-        print(f"\nThe platform {plateform} is not supported by {game_title}")
+    if games_data["Platforms"].values[0]!="" and not platform.lower() in games_data["Platforms"].values[0].lower():
+        print(f"\nThe platform {platform} is not supported by {game_title}")
         return None
 
-    if "playstation 4" in plateform.lower():
+    if "playstation 4" in platform.lower():
         TDP_plateform=TDP_ps4
         plateform_co2=ps4_co2
 
-    elif "playstation 5" in plateform.lower():
+    elif "playstation 5" in platform.lower():
         TDP_plateform=TDP_ps5
         plateform_co2=ps5_co2
 
-    elif "xbox one" in plateform.lower():
+    elif "xbox one" in platform.lower():
         TDP_plateform=TDP_xbox_one
         plateform_co2=xbox_one_co2
 
-    elif "xbox series x" in plateform.lower():
+    elif "xbox series x" in platform.lower():
         TDP_plateform=TDP_xbox_series_x
         plateform_co2=xbox_series_x_co2
 
     else: # PC by default, even if not platform because games are really often on PC
+        platform="PC"
         TDP_plateform=TDP_powersupply+TDP_gpu+TDP_motherboard+TDP_processor+TDP_ram+TDP_ssd
         plateform_co2=box_co2+gpu_co2+processor_co2+ssd_co2+ram_co2+motherboard_co2
         #plateform_co2=default_pc_co2
@@ -124,8 +125,8 @@ def calculate_consumption(game_title:str,plateform:str):
 
     Total_co2=round(plateform_co2+screen_co2+co2_per_kwh_fr*kWh)
 
-    calcul_dict={"Carbon_footprint_kgco2":Total_co2,"Total_kWh":kWh,"light_time_days":light_time,"gametime":gametime}
-    print(f"""En jouant à {games_data["Title"].values[0]} durant {gametime} heures, tu consommeras:\n{kWh} kWh d'electricité, soit {kWh*3600} kJ d'energie.\nCela correspond à laisser la lumière de ton joli salon allumé pendant {light_time} jours !\nL'empreinte carbone de ton materiel et de ton temps de jeu est estimé à environ {Total_co2} kg de CO2 émis ! Pense à la planète !""")
+    calcul_dict={"Carbon_footprint_kgco2":Total_co2,"Total_kWh":kWh,"light_time_days":light_time,"gametime":gametime,"platform":platform}
+    print(f"""En jouant à {games_data["Title"].values[0]} durant {gametime} heures sur {platform}, tu consommeras:\n{kWh} kWh d'electricité, soit {kWh*3600} kJ d'energie.\nCela correspond à laisser la lumière de ton joli salon allumé pendant {light_time} jours !\nL'empreinte carbone de ton materiel et de ton temps de jeu est estimé à environ {Total_co2} kg de CO2 émis ! Pense à la planète !""")
 
     return calcul_dict
 
@@ -158,6 +159,6 @@ def add_consumption(games_file_path: str = path+"/games_extrait.csv"):
         df_games[f"carbon_footprint_{console.lower().replace(' ', '_')}"] = df_games.apply(calculate_consumption_console, axis=1)
 
 
-dic=calculate_consumption("Interstellar transport company","Pc")
+dic=calculate_consumption("Interstellar transport company","")
 print(dic)
 #add_consumption()
