@@ -1,11 +1,12 @@
 import pandas as pd
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from database.database import clean_games_dataframe
+
+from database import clean_games_dataframe
 
 ROOT_DIR =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(ROOT_DIR)
 path=ROOT_DIR+"/_data"
 
 def calculate_consumption(game_title:str,plateform:str):
@@ -18,10 +19,10 @@ def calculate_consumption(game_title:str,plateform:str):
     processors=pd.read_csv(path+"/processors.csv")
     gpu=pd.read_csv(path+"/gpu.csv")
 
+    
     try:
         if not df_games[df_games["Title"].str.lower()==game_title.lower()].empty:
             games_data=df_games[df_games["Title"].str.lower()==game_title.lower()]
-            print(games_data.head())
         else:
             print(f"\n{game_title} not found in our database")
             return None
@@ -29,7 +30,7 @@ def calculate_consumption(game_title:str,plateform:str):
         print(e)
         print(f"\n{game_title} not found in our database")
         return None
-    
+
     ### Default values
     if games_data["Platforms"].empty:
         print("EMPTY")
@@ -67,7 +68,7 @@ def calculate_consumption(game_title:str,plateform:str):
     ps5_co2=xbox_series_x_co2 # No Data
 
         ## Values according to game and plateform
-    if not games_data["Main Story (Hours)"].empty and games_data["Main Story (Hours)"].any():
+    if not games_data["Main Story (Hours)"].empty and games_data["Main Story (Hours)"].values[0] !=-1:
         try:
             gametime=games_data["Main Story (Hours)"].values[0]
         except Exception as e:
@@ -77,19 +78,19 @@ def calculate_consumption(game_title:str,plateform:str):
         print("No game time information")
     
 
-    if not games_data["CPU"].empty:
+    if not games_data["CPU"].empty and games_data["CPU"].values[0]!="":
         try:
             TDP_processor=processors.at[games_data["CPU"].values[0],"TDP (W)"]
         except Exception as e:
             pass
     
-    if not games_data["GPU"].empty:
+    if not games_data["GPU"].empty and games_data["GPU"].values[0]!="":
         try:
             TDP_gpu=gpu.at[games_data["GPU"].values[0],"TDP (Watts)"]
         except Exception as e:
             pass
     
-    if not pd.isnull(games_data["Platforms"].values[0]) and not plateform.lower() in games_data["Platforms"].values[0].lower():
+    if games_data["Platforms"].values[0]!="" and not plateform.lower() in games_data["Platforms"].values[0].lower():
         print(f"\nThe platform {plateform} is not supported by {game_title}")
         return None
 
@@ -123,7 +124,7 @@ def calculate_consumption(game_title:str,plateform:str):
 
     Total_co2=round(plateform_co2+screen_co2+co2_per_kwh_fr*kWh)
 
-    calcul_dict={"Carbon_footprint_kgco2":Total_co2,"Total_kWh":kWh,"light_time_days":light_time}
+    calcul_dict={"Carbon_footprint_kgco2":Total_co2,"Total_kWh":kWh,"light_time_days":light_time,"gametime":gametime}
     print(f"""En jouant à {games_data["Title"].values[0]} durant {gametime} heures, tu consommeras:\n{kWh} kWh d'electricité, soit {kWh*3600} kJ d'energie.\nCela correspond à laisser la lumière de ton joli salon allumé pendant {light_time} jours !\nL'empreinte carbone de ton materiel et de ton temps de jeu est estimé à environ {Total_co2} kg de CO2 émis ! Pense à la planète !""")
 
     return calcul_dict
@@ -155,8 +156,6 @@ def add_consumption(games_file_path: str = path+"/games_extrait.csv"):
 
         # Appliquer la fonction calculate_consumption_console à chaque ligne du dataframe
         df_games[f"carbon_footprint_{console.lower().replace(' ', '_')}"] = df_games.apply(calculate_consumption_console, axis=1)
-
-
 
 
 dic=calculate_consumption("Interstellar transport company","Pc")
