@@ -2,3 +2,4 @@
 _data/*.csv
 _data/*.json
 test/
+database/__pycache__

@@ -1,3 +1,5 @@
+""" Modules importation """
+
 import requests
 import pandas as pd
 from io import StringIO
@@ -16,286 +18,344 @@ import undetected_chromedriver as uc
 import os
 from csv import DictWriter
 
-
 # Root directory:
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-path=f"{ROOT_DIR}/_data"
+path = f"{ROOT_DIR}/_data"
+
 
 def scrap_processors_en():
-    
-    def multicolumn(column:str,level:int):
-        multicolumns=[]
-        if level==1:
+    """This function scrap Intel processors data from the English version of Intel's processors Wikipedia page.
+    Returns a pandas dataframe having 2 columns:
+        Model : Model of the processor
+        TDP (W) : Thermal Design Power ( Watts )
+    """
+
+    def multicolumn(column: str, level: int):
+        multicolumns = []
+        if level == 1:
             return column
-        
+
         for k in range(level):
             multicolumns.append(column)
         return tuple(multicolumns)
 
-    url_processor_list=["https://en.wikipedia.org/wiki/List_of_Intel_processors"]
-    
-    df_processor=pd.DataFrame()
+    url_processor_list = ["https://en.wikipedia.org/wiki/List_of_Intel_processors"]
+
+    df_processor = pd.DataFrame()
     for url in url_processor_list:
         print(f"\n>>> Scrapping Intel processors list from : {url} ...")
         # Faire la requête HTTP et obtenir le contenu de la page
         response_processor = requests.get(url)
-        html_processor = BeautifulSoup(response_processor.text, 'html.parser')
+        html_processor = BeautifulSoup(response_processor.text, "html.parser")
 
-        dataframes=[]
+        dataframes = []
         # Finding all tables
-        tables = html_processor.find_all('table',class_=lambda x: x and "wikitable" in x)
+        tables = html_processor.find_all(
+            "table", class_=lambda x: x and "wikitable" in x
+        )
 
         for table in tables:
-            df=pd.read_html(StringIO(str(table)))
-            df=pd.concat(df)
+            df = pd.read_html(StringIO(str(table)))
+            df = pd.concat(df)
 
             try:
-                if 'Processor family' in df.columns and 'Model' in df.columns:
-                    df["Model"]=df[multicolumn("Processor family",df.columns.nlevels)]+ ' '+ df[multicolumn("Model",df.columns.nlevels)]
-                
-                df=df[["Model","TDP (W)"]]
-                df=df.dropna()
-                df=df.astype('string')
-                
-                df1=pd.DataFrame()
-                df1['Model'] = df.iloc[:, 0]
-                df1['TDP (W)'] = df.iloc[:, 1]
+                if "Processor family" in df.columns and "Model" in df.columns:
+                    df["Model"] = (
+                        df[multicolumn("Processor family", df.columns.nlevels)]
+                        + " "
+                        + df[multicolumn("Model", df.columns.nlevels)]
+                    )
+
+                df = df[["Model", "TDP (W)"]]
+                df = df.dropna()
+                df = df.astype("string")
+
+                df1 = pd.DataFrame()
+                df1["Model"] = df.iloc[:, 0]
+                df1["TDP (W)"] = df.iloc[:, 1]
                 dataframes.append(df1)
 
             except KeyError as k:
                 # Treating exceptions
-                
-                if 'TDP (W)' not in df.columns and 'TDP' not in df.columns:
-                    df[multicolumn("TDP (W)",df.columns.nlevels)]= ""
 
-                if 'Model' not in df.columns:
+                if "TDP (W)" not in df.columns and "TDP" not in df.columns:
+                    df[multicolumn("TDP (W)", df.columns.nlevels)] = ""
+
+                if "Model" not in df.columns:
                     try:
-                        df["Model"]=df[multicolumn("Model",df.columns.nlevels)]
+                        df["Model"] = df[multicolumn("Model", df.columns.nlevels)]
                     except Exception:
-                        df['Model'] = ""
+                        df["Model"] = ""
 
                 try:
-                    df=df[["Model","TDP (W)"]]
+                    df = df[["Model", "TDP (W)"]]
 
                 except KeyError as k:
                     try:
-                        df=df[["Model","TDP"]]
+                        df = df[["Model", "TDP"]]
                     except Exception:
                         pass
 
-                df=df.dropna()
-                df=df.astype('string')
-                dataframe=pd.DataFrame()
+                df = df.dropna()
+                df = df.astype("string")
+                dataframe = pd.DataFrame()
 
                 # Ajouter les données des colonnes "(Modèle, Modèle)" à "Modèle"
-                dataframe['Model'] = df.iloc[:, 0]
-                dataframe['TDP (W)'] = df.iloc[:, 1]
-                dataframe=dataframe[dataframe["Model"] !="<NA>"]
-                dataframe=dataframe[dataframe["Model"] !=""]
+                dataframe["Model"] = df.iloc[:, 0]
+                dataframe["TDP (W)"] = df.iloc[:, 1]
+                dataframe = dataframe[dataframe["Model"] != "<NA>"]
+                dataframe = dataframe[dataframe["Model"] != ""]
 
                 dataframes.append(dataframe)
 
-    df_processor=pd.concat(dataframes, ignore_index=True)
-
-
+    df_processor = pd.concat(dataframes, ignore_index=True)
 
     return df_processor
 
-def scrap_processors(path:str=path):
-    url_processor_list=["https://fr.wikipedia.org/wiki/Liste_des_microprocesseurs_Intel"]    
-    
+
+def scrap_processors(path: str = path):
+    """This function scrap Intel processors data from the French version of Intel's processors Wikipedia page.
+    Uses the scrap_processors_en() function and creates a complete processors dataframe.
+    Creates the file : _data/processors.csv.
+    Columns :
+        Model : Model of the processor
+        TDP (W) : Thermal Design Power ( Watts )
+    """
+    url_processor_list = [
+        "https://fr.wikipedia.org/wiki/Liste_des_microprocesseurs_Intel"
+    ]
+
     for url in url_processor_list:
         print(f"\n>>> Scrapping Intel processors list from : {url} ...")
 
         # Faire la requête HTTP et obtenir le contenu de la page
         response_processor = requests.get(url)
-        html_processor = BeautifulSoup(response_processor.text, 'html.parser')
+        html_processor = BeautifulSoup(response_processor.text, "html.parser")
 
-        dataframes=[]
+        dataframes = []
         # Finding all tables
-        tables = html_processor.find_all('table',class_=lambda x: x and "wikitable" in x)
+        tables = html_processor.find_all(
+            "table", class_=lambda x: x and "wikitable" in x
+        )
 
         for table in tables:
-            df=pd.read_html(StringIO(str(table)))
-            df=pd.concat(df)
+            df = pd.read_html(StringIO(str(table)))
+            df = pd.concat(df)
 
             try:
-                df=df[["Modèle","TDP "]]
-                df=df.dropna()
-                df=df.astype('string')
+                df = df[["Modèle", "TDP "]]
+                df = df.dropna()
+                df = df.astype("string")
                 dataframes.append(df)
 
             except KeyError as k:
-                if 'TDP' not in df.columns:
-                    df['TDP'] = ""
-                
-                if 'Modèle' not in df.columns:
-                    if 'Nom' in df.columns and 'Numéro de modèle' in df.columns:
-                        df['Modèle']=df['Numéro de modèle']+' '+ df['Nom']
+                if "TDP" not in df.columns:
+                    df["TDP"] = ""
+
+                if "Modèle" not in df.columns:
+                    if "Nom" in df.columns and "Numéro de modèle" in df.columns:
+                        df["Modèle"] = df["Numéro de modèle"] + " " + df["Nom"]
                     else:
-                        df['Modèle'] = ""
-                
-                df=df[["Modèle","TDP"]]
-                df=df.astype('string')
+                        df["Modèle"] = ""
+
+                df = df[["Modèle", "TDP"]]
+                df = df.astype("string")
                 dataframes.append(df)
 
-        df_processor=pd.concat(dataframes, ignore_index=True)
+        df_processor = pd.concat(dataframes, ignore_index=True)
 
     # Supprimer les colonnes en double
     df_processor = df_processor.loc[:, ~df_processor.columns.duplicated()]
 
-    dataframe=pd.DataFrame()
+    dataframe = pd.DataFrame()
     # Ajouter les données des colonnes "(Modèle, Modèle)" à "Modèle"
-    dataframe['Modèle'] = df_processor.iloc[:,2]
+    dataframe["Modèle"] = df_processor.iloc[:, 2]
 
     # Ajouter les données des colonnes "(TDP, TDP)" à "TDP"
-    dataframe['TDP'] = df_processor.iloc[:,3]
+    dataframe["TDP"] = df_processor.iloc[:, 3]
 
-    df_processor=pd.concat([df_processor,dataframe], ignore_index=True)
+    df_processor = pd.concat([df_processor, dataframe], ignore_index=True)
 
     # Supprimer les colonnes temporaires "(Modèle, Modèle)" et "(TDP, TDP)"
-    df_processor = df_processor.drop(df_processor.columns[[2,3]], axis=1)
+    df_processor = df_processor.drop(df_processor.columns[[2, 3]], axis=1)
 
-    df_processor = df_processor[df_processor['TDP'].str.endswith('W')]
-    df_processor['TDP'] = pd.to_numeric(df_processor['TDP'].str.rstrip('W').str.replace(',', '.'), errors='coerce').fillna(65)
+    df_processor = df_processor[df_processor["TDP"].str.endswith("W")]
+    df_processor["TDP"] = pd.to_numeric(
+        df_processor["TDP"].str.rstrip("W").str.replace(",", "."), errors="coerce"
+    ).fillna(65)
     # On fixe à 65W les TDP non mentionnés
 
-    df_processor['Modèle'] = df_processor['Modèle'].str.replace('-', " ", regex=True)
+    df_processor["Modèle"] = df_processor["Modèle"].str.replace("-", " ", regex=True)
     df_processor = df_processor.reset_index(drop=True)
 
-    df_processor=df_processor.rename(columns={"Modèle":"Model","TDP":"TDP (W)"})
+    df_processor = df_processor.rename(columns={"Modèle": "Model", "TDP": "TDP (W)"})
 
-    df_processor2=scrap_processors_en()
+    df_processor2 = scrap_processors_en()
 
-    df_processor = df_processor.drop_duplicates(subset='Model')
+    df_processor = df_processor.drop_duplicates(subset="Model")
 
     # Data Postprocessing
-    df_processor["Model"] = df_processor["Model"].str.extract(r'([^\[]*)')
+    df_processor["Model"] = df_processor["Model"].str.extract(r"([^\[]*)")
 
     mask = df_processor["Model"].str.contains("^i\d")
     # Add "Core " for intel core i processors
     df_processor.loc[mask, "Model"] = "Core " + df_processor.loc[mask, "Model"]
 
     # Merging both dataframes
-    df_processor_final = pd.merge(df_processor, df_processor2, on='Model', how='outer',suffixes=('', '_processor2'))
-    df_processor_final['TDP (W)'] = df_processor_final['TDP (W)'].combine_first(df_processor_final['TDP (W)_processor2'])
+    df_processor_final = pd.merge(
+        df_processor,
+        df_processor2,
+        on="Model",
+        how="outer",
+        suffixes=("", "_processor2"),
+    )
+    df_processor_final["TDP (W)"] = df_processor_final["TDP (W)"].combine_first(
+        df_processor_final["TDP (W)_processor2"]
+    )
 
-
-    df_processor.to_csv(f"{path}/processors.csv",index=False)
+    df_processor.to_csv(f"{path}/processors.csv", index=False)
 
     print(f"\nProcessors list data file successfuly created !")
 
     return
-    
-def scrap_graphiccards(path:str=path):
 
-    url_graphic_card="https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units"
+
+def scrap_graphiccards(path: str = path):
+    """This function scrap NVIDIA GPUs data from the NVIDIA's GPUs list Wikipedia page.
+    Creates the file : _data/gpu.csv.
+    Columns :
+        Model : Model of the GPU
+        TDP (Watts) : Thermal Design Power ( Watts )
+    """
+    url_graphic_card = (
+        "https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units"
+    )
     print(f"\n>>> Scrapping NVIDIA GPU list from : {url_graphic_card} ...")
     # HTTP request
     response_gc = requests.get(url_graphic_card)
-    html_gc = BeautifulSoup(response_gc.text, 'html.parser')
+    html_gc = BeautifulSoup(response_gc.text, "html.parser")
 
-    dataframes=[]
+    dataframes = []
     # Finding all tables
-    tables = html_gc.find_all('table')
+    tables = html_gc.find_all("table")
 
     for table in tables:
-        df=pd.read_html(StringIO(str(table)))
-        df=pd.concat(df)
+        df = pd.read_html(StringIO(str(table)))
+        df = pd.concat(df)
         try:
-            df=df[["Model","TDP (Watts)"]]
-            
-            #dataframes.append(df)
-            #df.info()
+            df = df[["Model", "TDP (Watts)"]]
+
+            # dataframes.append(df)
+            # df.info()
         except KeyError as k:
-            if 'TDP (Watts)' not in df.columns and ('TDP (watts)') not in df.columns:
-                df['TDP (Watts)'] = ""
-            
-            if 'Model' not in df.columns:
-                df['Model'] = ""
+            if "TDP (Watts)" not in df.columns and ("TDP (watts)") not in df.columns:
+                df["TDP (Watts)"] = ""
 
-            if ('TDP (watts)')  in df.columns:
-                df=df[["Model","TDP (watts)"]]
+            if "Model" not in df.columns:
+                df["Model"] = ""
 
-            elif ('TDP (watts)') not in df.columns:
-                df=df[["Model","TDP (Watts)"]]
+            if ("TDP (watts)") in df.columns:
+                df = df[["Model", "TDP (watts)"]]
 
-            #dataframes.append(df)
-            #df.info()
+            elif ("TDP (watts)") not in df.columns:
+                df = df[["Model", "TDP (Watts)"]]
 
-        df=df.dropna()
-        df=df.astype('string')
+            # dataframes.append(df)
+            # df.info()
+
+        df = df.dropna()
+        df = df.astype("string")
 
         # Supprimer les colonnes en double
         df = df.loc[:, ~df.columns.duplicated()]
 
-        dataframe=pd.DataFrame()
+        dataframe = pd.DataFrame()
 
-        dataframe['Model'] = df.iloc[:,0]
+        dataframe["Model"] = df.iloc[:, 0]
 
-        dataframe['TDP (Watts)'] = df.iloc[:,1]
+        dataframe["TDP (Watts)"] = df.iloc[:, 1]
 
-        df=dataframe
+        df = dataframe
         dataframes.append(df)
 
-
-    df_gc=pd.concat(dataframes, ignore_index=True)
-    df_gc=df_gc[df_gc["Model"] !=""]
-    df_gc=df_gc[df_gc["Model"] !="Model"]
+    df_gc = pd.concat(dataframes, ignore_index=True)
+    df_gc = df_gc[df_gc["Model"] != ""]
+    df_gc = df_gc[df_gc["Model"] != "Model"]
 
     # Data Postprocessing
-    df_gc["TDP (Watts)"] = df_gc["TDP (Watts)"].str.extract('(\d+)[\s-]?').astype(float)
-    df_gc["Model"] = df_gc["Model"].str.extract(r'([^\[]*)')
+    df_gc["TDP (Watts)"] = df_gc["TDP (Watts)"].str.extract("(\d+)[\s-]?").astype(float)
+    df_gc["Model"] = df_gc["Model"].str.extract(r"([^\[]*)")
 
-    df_gc.to_csv(f"{path}/gpu.csv",index=False)
+    df_gc.to_csv(f"{path}/gpu.csv", index=False)
 
     print(f"\nGraphic cards list data file successfuly created !")
     return
 
 
 def get_games_scrapped_number(file_path=f"{path}/games_part_2.csv"):
-    # Return a dict of number of games scrapped by 1st letter
-    
+    """
+    This function returns a dictionnary of the number of games scrapped by their 1st letter.
+    Exemple:
+    {"a":75,"b":96 ...}
+    """
+
     df = pd.read_csv(file_path)
 
     # Counting games by title's 1st letter
-    title_count_by_first_letter = df['Title'].astype(str).str[0].str.lower().value_counts().to_dict()
+    title_count_by_first_letter = (
+        df["Title"].astype(str).str[0].str.lower().value_counts().to_dict()
+    )
 
     return title_count_by_first_letter
 
+
 def scrap_howlongtobbeat():
+    """This function scraps games data from HowLongToBeat.com
+    Creates the file : _data/games_part_1.csv.
+    Columns :
+        Title : Games title
+        Main Story (Hours) : Time in hours needed to finish the main story of the game
+        Platforms : Games devices supported
+        Genres : Genres of the game
+        Image : Image url of the cover
+    """
 
     print(f"\n>>> Scrapping games data from HowLongToBeat.com ...")
 
-    games_list=[]
-    game_page=1 # Initialisation of this variable
-    max_games_per_page=30 # Maximum number of games per page to scrap for example. Default 30
-    max_pages=3600 # Maximum number of games list pages. Default 3600
+    games_list = []
+    game_page = 1  # Initialisation of this variable
+    max_games_per_page = (
+        30  # Maximum number of games per page to scrap for example. Default 30
+    )
+    max_pages = 3600  # Maximum number of games list pages. Default 3600
 
     # Chrome options
     chrome_options = Options()
-    chrome_options.add_argument('--ignore-certificate-errors')
-    chrome_options.add_argument('--ignore-ssl-errors')
+    chrome_options.add_argument("--ignore-certificate-errors")
+    chrome_options.add_argument("--ignore-ssl-errors")
     chrome_options.add_argument("start-maximized")
-    #chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
-    chrome_options.add_argument('--headless')
+    # chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
+    chrome_options.add_argument("--headless")
 
     driver = uc.Chrome(options=chrome_options)
     # sets timeout to 30
     driver.set_page_load_timeout(30)
-    #driver = webdriver.Chrome(options=chrome_options)
 
-    driver.get('https://howlongtobeat.com/?q=') # Uncomment to scrapp all games
-    #driver.get('https://howlongtobeat.com/?q=a') # Scrapping only games starting with 'a' for exemple
+    driver.get("https://howlongtobeat.com/?q=")  # Uncomment to scrapp all games
+    # driver.get('https://howlongtobeat.com/?q=a') # Scrapping only games starting with 'a' for exemple
 
     wait = WebDriverWait(driver, 10)
 
     # Accepting cookies
     try:
         print("\nAccepting cookies ...")
-        cookies_button = wait.until(EC.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler')))
+        cookies_button = wait.until(
+            EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
+        )
         cookies_button.click()
-        wait.until(EC.invisibility_of_element_located((By.ID, 'onetrust-accept-btn-handler')))
+        wait.until(
+            EC.invisibility_of_element_located((By.ID, "onetrust-accept-btn-handler"))
+        )
         print("\nCookies accepted")
     except NoSuchElementException as e:
         print(e)
@@ -305,22 +365,35 @@ def scrap_howlongtobbeat():
         print(e)
         pass
 
-
+    # Checking if games list is loaded
     try:
-        page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish.GameCard_search_list__IuMbi')))
+        page_items = wait.until(
+            EC.presence_of_all_elements_located(
+                (By.CLASS_NAME, "back_darkish.GameCard_search_list__IuMbi")
+            )
+        )
     except TimeoutException:
-        page_items = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'back_darkish GameCard_search_list__IuMbi')))
+        page_items = wait.until(
+            EC.presence_of_all_elements_located(
+                (By.CLASS_NAME, "back_darkish GameCard_search_list__IuMbi")
+            )
+        )
     except Exception as e:
         driver.quit()
         raise e
 
-    if len(page_items) >=max_games_per_page:
-        iter_games=max_games_per_page
+    if len(page_items) >= max_games_per_page:
+        iter_games = max_games_per_page
     else:
-        iter_games= len(page_items)
+        iter_games = len(page_items)
 
+    # Checking the total number of pages
     try:
-        number_of_pages=wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="__next"]/div/main/div/div/div[6]/div/button[2]')))
+        number_of_pages = wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[2]')
+            )
+        )
         driver.execute_script("arguments[0].scrollIntoView();", number_of_pages)
         number_of_pages = int(number_of_pages.text.strip())
         print(f"Number of pages : {number_of_pages}")
@@ -329,22 +402,32 @@ def scrap_howlongtobbeat():
         driver.quit()
         raise e
 
-    if number_of_pages >=max_pages:
-        iter_pages=max_pages
+    if number_of_pages >= max_pages:
+        iter_pages = max_pages
     else:
-        iter_pages= number_of_pages
+        iter_pages = number_of_pages
 
     try:
+        # Treating a page
         for p in range(iter_pages):
-            print("Page number: ",game_page)
-            print("Number of games in this page: ",len(page_items))
-            for k in range(iter_games):
+            print("Page number: ", game_page)
+            print("Number of games in this page: ", len(page_items))
 
+            # Treating a game page
+            for k in range(iter_games):
                 try:
-                    wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="search-results-header"]/ul')))
+                    wait.until(
+                        EC.presence_of_all_elements_located(
+                            (By.XPATH, '//*[@id="search-results-header"]/ul')
+                        )
+                    )
                 except TimeoutException:
                     driver.refresh()
-                    wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="search-results-header"]/ul')))
+                    wait.until(
+                        EC.presence_of_all_elements_located(
+                            (By.XPATH, '//*[@id="search-results-header"]/ul')
+                        )
+                    )
                 except Exception as e:
                     raise Exception
 
@@ -353,7 +436,9 @@ def scrap_howlongtobbeat():
                 # Clicking on game page
                 try:
                     # Waiting for the page to load
-                    page_item = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+                    page_item = wait.until(
+                        EC.presence_of_element_located((By.XPATH, xpath))
+                    )
 
                     driver.execute_script("arguments[0].scrollIntoView();", page_item)
                     print("\nScrolled")
@@ -373,9 +458,13 @@ def scrap_howlongtobbeat():
                     # Retry clicking on the element
                     try:
                         # Waiting for the page to load
-                        page_item = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+                        page_item = wait.until(
+                            EC.presence_of_element_located((By.XPATH, xpath))
+                        )
 
-                        driver.execute_script("arguments[0].scrollIntoView();", page_item)
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", page_item
+                        )
                         print("\nScrolled")
                         wait.until(EC.element_to_be_clickable(page_item))
                         print("\nWaited for element to be clickable")
@@ -386,77 +475,121 @@ def scrap_howlongtobbeat():
                         print("\nAccessed to game page")
 
                     except TimeoutException:
-                        print("La nouvelle page n'a pas été correctement chargée après le clic.")
+                        print(
+                            "La nouvelle page n'a pas été correctement chargée après le clic."
+                        )
                         driver.back()
                         continue
-                    
-                    print("Clic réussi et nouvelle page chargée avec succès.")
 
+                    print("Clic réussi et nouvelle page chargée avec succès.")
 
                 # Scrapping data :
                 try:
-                    games_data={}
-                    games_data["Title"]=title
-                    print("\nTreating : ",title)
+                    games_data = {}
+                    games_data["Title"] = title
+                    print("\nTreating : ", title)
 
                     # Waiting for the page to load
                     wait = WebDriverWait(driver, 10)
 
                     # Scrapping main story game time
-                    try:                                                      
-                        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')))
-                        main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]')
-                        print("Main Story found")                            
+                    try:
+                        wait.until(
+                            EC.presence_of_element_located(
+                                (
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]',
+                                )
+                            )
+                        )
+                        main_story_time_element = driver.find_element(
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]',
+                        )
+                        print("Main Story found")
                     except TimeoutException:
-                        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')))
-                        main_story_time_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]')
+                        wait.until(
+                            EC.presence_of_element_located(
+                                (
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]',
+                                )
+                            )
+                        )
+                        main_story_time_element = driver.find_element(
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]',
+                        )
                         print("Main Story found")
                     except Exception:
                         pass
-                    
-                    driver.execute_script("arguments[0].scrollIntoView();", main_story_time_element)
-                    table=main_story_time_element.text.strip()
+
+                    driver.execute_script(
+                        "arguments[0].scrollIntoView();", main_story_time_element
+                    )
+                    table = main_story_time_element.text.strip()
                     mainstory = table.partition("Main Story")[2].strip()
                     try:
                         mainstory = mainstory.partition("Hours")[0].strip()
                     except Exception:
                         mainstory = table.partition("Main Story")[2].strip()
-                    games_data["Main Story (Hours)"]=mainstory
+                    games_data["Main Story (Hours)"] = mainstory
                     print("Main Story scrapped")
-
 
                     # Scrapping plateform
                     try:
-                        plateform_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]')
-                        driver.execute_script("arguments[0].scrollIntoView();", plateform_element)
-                        table=plateform_element.text.strip()
+                        plateform_element = driver.find_element(
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]',
+                        )
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", plateform_element
+                        )
+                        table = plateform_element.text.strip()
                         plateform = table.partition("Platforms:")[2].strip()
-                        games_data["Platforms"]=plateform
+                        games_data["Platforms"] = plateform
                         print("Platforms scrapped")
                     except Exception:
                         pass
 
                     # Scrapping genres
                     try:
-                        genres_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]')
-                        driver.execute_script("arguments[0].scrollIntoView();", genres_element)
-                        table=genres_element.text.strip()
+                        genres_element = driver.find_element(
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]',
+                        )
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", genres_element
+                        )
+                        table = genres_element.text.strip()
                         genres = table.partition("Genres:")[2].strip()
-                        games_data["Genres"]=genres
+                        games_data["Genres"] = genres
                         print("Genres scrapped")
                     except Exception:
                         pass
 
                     # Scrapping game cover
                     try:
-                        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img')))
-                        cover_element = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img')
+                        wait.until(
+                            EC.presence_of_element_located(
+                                (
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img',
+                                )
+                            )
+                        )
+                        cover_element = driver.find_element(
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img',
+                        )
                         print("Cover found")
-                        driver.execute_script("arguments[0].scrollIntoView();", cover_element)
-                        cover = cover_element.get_attribute('src')
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", cover_element
+                        )
+                        cover = cover_element.get_attribute("src")
                         print(cover)
                         cover = cover.split("?")[0]
-                        games_data["Image"]=cover
+                        games_data["Image"] = cover
                         print("Game cover scrapped")
                     except Exception:
                         pass
@@ -466,161 +599,247 @@ def scrap_howlongtobbeat():
 
                     csv_file_path = f"{path}/games_part_1.csv"
 
-                    # Vérifier si le fichier CSV existe
+                    # Checking if CSV file exists
                     if os.path.exists(csv_file_path):
-                        # Charger le fichier CSV existant
+                        # Loading CSV file
                         existing_df = pd.read_csv(csv_file_path)
                         try:
-                            existing_df["Main Story (Hours)"] = existing_df["Main Story (Hours)"].str.extract('(\d+)').astype(int)
+                            existing_df["Main Story (Hours)"] = (
+                                existing_df["Main Story (Hours)"]
+                                .str.extract("(\d+)")
+                                .astype(int)
+                            )
                         except Exception:
                             pass
 
-                        # Vérifier si la ligne existe déjà
-                        if not existing_df[existing_df['Title'] == games_data['Title']].empty:
+                        # Checking if the line already exists
+                        if not existing_df[
+                            existing_df["Title"] == games_data["Title"]
+                        ].empty:
                             print("Data already exists in the file")
                         else:
-                            # Ajouter la ligne au fichier CSV
-                            with open(csv_file_path, 'a', newline='', encoding='utf-8') as f_object:
-                                dictwriter_object = DictWriter(f_object, fieldnames=list(games_data.keys()))
+                            # Adding line
+                            with open(
+                                csv_file_path, "a", newline="", encoding="utf-8"
+                            ) as f_object:
+                                dictwriter_object = DictWriter(
+                                    f_object, fieldnames=list(games_data.keys())
+                                )
 
-                                # Passer le dictionnaire comme argument à writerow()
+                                # Using DictWriter
                                 dictwriter_object.writerow(games_data)
                                 # Close the file object
                                 f_object.close()
                                 print(f"\nGame data added to {csv_file_path} !")
 
-                    # Si le fichier CSV n'existe pas, le créer avec les données
+                    # If doesn't exists, creating the csv file.
                     else:
                         final_df = pd.DataFrame([games_data])
                         try:
-                            final_df["Main Story (Hours)"] = final_df["Main Story (Hours)"].str.extract('(\d+)').astype(int)
+                            final_df["Main Story (Hours)"] = (
+                                final_df["Main Story (Hours)"]
+                                .str.extract("(\d+)")
+                                .astype(int)
+                            )
                         except Exception:
                             pass
-                        final_df.to_csv(csv_file_path, index=False, encoding='utf-8')
+                        final_df.to_csv(csv_file_path, index=False, encoding="utf-8")
                         print(f"\nCSV file successfuly created at {csv_file_path} !")
 
                     wait = WebDriverWait(driver, 10)
-                    
+
                 except NoSuchElementException:
                     continue
 
                 # Go back to games list page
                 driver.back()
-            
+
             wait = WebDriverWait(driver, 20)
 
-            if game_page==1:
-                next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]')))
-                next_page_button = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]')
+            if game_page == 1:
+                next_page_button = wait.until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]',
+                        )
+                    )
+                )
+                next_page_button = driver.find_element(
+                    By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]'
+                )
             else:
-                next_page_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]')))
-                next_page_button = driver.find_element(By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]')
+                next_page_button = wait.until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.XPATH,
+                            '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]',
+                        )
+                    )
+                )
+                next_page_button = driver.find_element(
+                    By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]'
+                )
 
             driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
             wait.until(EC.element_to_be_clickable(next_page_button))
 
-            game_page+=1
+            game_page += 1
 
             # Clicking on next page
             try:
-                driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+                driver.execute_script(
+                    "arguments[0].scrollIntoView();", next_page_button
+                )
                 wait.until(EC.element_to_be_clickable(next_page_button))
                 driver.execute_script("arguments[0].click();", next_page_button)
 
             except Exception as e:
                 raise Exception
-            
+
     except Exception as e:
         print(e)
         pass
 
     finally:
         driver.quit()
-        
+
     print(f"\nGames data file successfuly created !")
 
-def scrap_canyourunit(games_scrapped:dict={}):
 
+def scrap_canyourunit(games_scrapped: dict = {}):
+    """This function scraps games data from SystemRequirementsLab.com
+    Creates the file : _data/games_part_2.csv.
+    Columns :  Title,CPU,GPU,RAM,Image
+        Title : Game title
+        CPU : Minimum CPU needed to run the game
+        GPU : Minimum GPU needed to run the game
+        RAM : Minimum RAM needed to run the game
+        Image : Image url of the cover
+    """
     print(f"\n>>> Scrapping games system requirements from the CanYouRunIt website ...")
 
-    max=1000 #maximum number of games to scrap per page. Default 1000
+    max = 1000  # maximum number of games to scrap per page. Default 1000
 
     # Chrome options
-    chrome_options = Options()  
-    chrome_options.add_argument('--headless')
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("start-maximized")
-    chrome_options.add_argument('--ignore-certificate-errors')
-    chrome_options.add_argument('--ignore-ssl-errors')   
-    #chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
+    chrome_options.add_argument("--ignore-certificate-errors")
+    chrome_options.add_argument("--ignore-ssl-errors")
+    # chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
 
     driver = uc.Chrome(options=chrome_options)
 
     # sets timeout to 30
     driver.set_page_load_timeout(30)
-    #driver = webdriver.Chrome(options=chrome_options)
+    # driver = webdriver.Chrome(options=chrome_options)
 
-    requirements_list=[]
-    letter_scrapped=list(games_scrapped.keys())
+    requirements_list = []
+    letter_scrapped = list(games_scrapped.keys())
 
     url = "https://www.systemrequirementslab.com/all-games-list/?filter="
-    end_list = ['a','b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    end_list = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+    ]
     # Uncomment if you want to scrapp all games
 
-    #end_list = ['a','b','c'] # Only scrapping 1 page for exemple
+    # end_list = ['a','b','c'] # Only scrapping 1 page for exemple
 
     # Removing pages if already scrapped
 
     def insert_to_csv_part_2(data_dict):
         csv_file_path = f"{path}/games_part_2.csv"
 
-        # Vérifier si le fichier CSV existe
+        # Checking if CSV file exists
         if os.path.exists(csv_file_path):
-            # Charger le fichier CSV existant
+            # Loading CSV file
             print("Reading CSV file")
             existing_df = pd.read_csv(csv_file_path)
             print("CSV file readed !")
-            # Vérifier si la ligne existe déjà
-            if not existing_df[existing_df['Title'] == data_dict['Title']].empty:
+
+            # Checking if the line already exists
+            if not existing_df[existing_df["Title"] == data_dict["Title"]].empty:
                 print("Data already exists in the file")
 
             else:
-                # Ajouter la ligne au fichier CSV
-                with open(csv_file_path, 'a', newline='', encoding='utf-8') as f_object:
-                    dictwriter_object = DictWriter(f_object, fieldnames=list(data_dict.keys()))
+                # Adding line to csv file
+                with open(csv_file_path, "a", newline="", encoding="utf-8") as f_object:
+                    dictwriter_object = DictWriter(
+                        f_object, fieldnames=list(data_dict.keys())
+                    )
 
-                    # Passer le dictionnaire comme argument à writerow()
                     dictwriter_object.writerow(data_dict)
                     # Close the file object
                     f_object.close()
                     print(f"\nGame data added to {csv_file_path} !")
-                    games_scrapped[letter]+=1
+                    games_scrapped[letter] += 1
 
-        # Si le fichier CSV n'existe pas, le créer avec les données
+        # Creating the CSV file if it doesn't exists
         else:
             final_df = pd.DataFrame([data_dict])
-            final_df.to_csv(csv_file_path, index=False, encoding='utf-8')
+            final_df.to_csv(csv_file_path, index=False, encoding="utf-8")
             print(f"\nCSV file successfuly created at {csv_file_path} !")
-            games_scrapped[letter]+=1
+            games_scrapped[letter] += 1
 
     try:
-
-        if len(letter_scrapped)>1:
-            for k in range(1,len(letter_scrapped)):
+        if len(letter_scrapped) > 1:
+            for k in range(1, len(letter_scrapped)):
                 if letter_scrapped[k] in end_list:
-                    end_list.remove(letter_scrapped[k-1])   
+                    end_list.remove(letter_scrapped[k - 1])
 
-        for letter in end_list: # Browsing all games pages starting with a specific caracter in end_list 
+        for letter in end_list:
+            # Browsing all games pages starting with a specific caracter in end_list
             driver.get(url + letter)
             wait = WebDriverWait(driver, 10)
             driver.implicitly_wait(10)
 
             if letter not in letter_scrapped:
-                games_scrapped[letter]=0
+                games_scrapped[letter] = 0
 
             # Accepting cookies
             try:
                 print("\nAccepting cookies ...")
-                cookies_button = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]')))
+                cookies_button = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, '//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]')
+                    )
+                )
                 cookies_button.click()
                 print("\nCookies accepted")
             except NoSuchElementException as e:
@@ -630,28 +849,34 @@ def scrap_canyourunit(games_scrapped:dict={}):
             except Exception as e:
                 print(e)
                 pass
-            
+
             try:
                 # Waiting that class: "pt-3 pb-1 pl-3" is there
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'pt-3.pb-1.pl-3')))
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "pt-3.pb-1.pl-3"))
+                )
 
                 # Finding all element having the class: "page-item". It corresponds to games.
-                page_items = driver.find_elements(By.CSS_SELECTOR, '.list-unstyled .page-item')
+                page_items = driver.find_elements(
+                    By.CSS_SELECTOR, ".list-unstyled .page-item"
+                )
                 print(f"\nNumber of games on this page : {len(page_items)}")
             except Exception as e:
-                print("\nErreur inattendue : ",e)
+                print("\nErreur inattendue : ", e)
                 continue
 
             # Parcourir les éléments cliquables et cliquer sur chacun
-            if len(page_items) >=max:
-                iter=max
+            if len(page_items) >= max:
+                iter = max
             else:
-                iter= len(page_items)
+                iter = len(page_items)
 
-            for k in range(games_scrapped[letter],iter):
-                xpath=f'//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/ul/li[{k+1}]/a'
+            for k in range(games_scrapped[letter], iter):
+                xpath = f'//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/ul/li[{k+1}]/a'
                 try:
-                    page_item=WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                    page_item = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
                     print("\nWaiting for the next game ...")
                     # Scrapping game title
                     title = page_item.text.strip()
@@ -659,7 +884,9 @@ def scrap_canyourunit(games_scrapped:dict={}):
                 except TimeoutException:
                     driver.refresh()
                     print("\nWaiting for the next game ...")
-                    page_item=WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                    page_item = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
                     # Scrapping game title
                     title = page_item.text.strip()
 
@@ -669,138 +896,154 @@ def scrap_canyourunit(games_scrapped:dict={}):
 
                 # Clicking on game page
                 try:
-                    page_item=WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                    page_item = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
                     print(f"\n------------------------------\nTreating : {title}")
                     driver.execute_script("arguments[0].scrollIntoView();", page_item)
                     print("\nScrolled")
                     wait.until(EC.element_to_be_clickable(page_item))
                     print("\nWaited for element to be clickable")
-                    #page_item.click()
+                    # page_item.click()
                     driver.execute_script("arguments[0].click();", page_item)
                     print("\nAccessed to the game page")
 
                 except TimeoutException as e:
                     print(f"Erreur lors du clic : {e}")
                     # Go back to games list page
-                    #driver.back()
+                    # driver.back()
                     driver.execute_script("window.history.go(-1)")
                     print("\nRetour à la page précedente")
 
                     # Retry clicking on the element
                     try:
-                        driver.execute_script("arguments[0].scrollIntoView();", page_item)
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", page_item
+                        )
                         print("\nScrolled")
                         wait.until(EC.element_to_be_clickable(page_item))
                         print("\nWaited for element to be clickable")
-                        #page_item.click()
+                        # page_item.click()
                         driver.execute_script("arguments[0].click();", page_item)
 
                     except TimeoutException:
-                        print("\nTimed out waiting for the element to be clickable. Skipping this game.")
+                        print(
+                            "\nTimed out waiting for the element to be clickable. Skipping this game."
+                        )
                         driver.back()
                         continue
 
                     except Exception as e:
                         print(e)
                         continue
-                    
+
                     print("Clic réussi et nouvelle page chargée avec succès.")
                 except Exception as e:
                     print(e)
                     continue
 
                 # Scrapping data :
-                data_dict={}
-                    
-                try:
+                data_dict = {}
 
-                    element_to_scrape = driver.find_element(By.XPATH, '//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/div[4]/div[1]/div[1]')
-                    driver.execute_script("arguments[0].scrollIntoView();", element_to_scrape)
-                    
+                try:
+                    element_to_scrape = driver.find_element(
+                        By.XPATH,
+                        '//*[@id="main-table"]/tbody/tr/td[2]/div/div[2]/main/div/div[1]/div/div[4]/div[1]/div[1]',
+                    )
+                    driver.execute_script(
+                        "arguments[0].scrollIntoView();", element_to_scrape
+                    )
+
                     # Fulfilling dictionnary
-                    table=element_to_scrape.text
+                    table = element_to_scrape.text
                     result = [line.split(": ") for line in table.split("\n")[:4]]
 
                     # Scrapping game cover
                     try:
-                        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="box-shots"]/img')))
-                        cover_element = driver.find_element(By.XPATH, '//*[@id="box-shots"]/img')
+                        wait.until(
+                            EC.presence_of_element_located(
+                                (By.XPATH, '//*[@id="box-shots"]/img')
+                            )
+                        )
+                        cover_element = driver.find_element(
+                            By.XPATH, '//*[@id="box-shots"]/img'
+                        )
                         # print("Cover found")
-                        driver.execute_script("arguments[0].scrollIntoView();", cover_element)
-                        cover = cover_element.get_attribute('src')
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", cover_element
+                        )
+                        cover = cover_element.get_attribute("src")
                         # print(cover)
                         cover = cover.split("?")[0]
                         print("Game cover scrapped")
 
                     except Exception as e:
                         print(f"Erreur inattendue : {e}")
-                        cover=""
+                        cover = ""
                         pass
 
+                    # Creating data dictionnary
                     try:
                         dict = {item[0]: item[1] for item in result}
-                        data_dict['Title'] = title
-                        if 'CPU' in dict.keys():
-                            data_dict['CPU']=dict['CPU'] 
-                        if 'VIDEO CARD' in dict.keys():
-                            data_dict['GPU']=dict['VIDEO CARD']
-                        if 'RAM' in dict.keys():
-                            data_dict['RAM']=dict['RAM']
+                        data_dict["Title"] = title
+                        if "CPU" in dict.keys():
+                            data_dict["CPU"] = dict["CPU"]
+                        if "VIDEO CARD" in dict.keys():
+                            data_dict["GPU"] = dict["VIDEO CARD"]
+                        if "RAM" in dict.keys():
+                            data_dict["RAM"] = dict["RAM"]
 
-                        data_dict["Image"]=cover
+                        data_dict["Image"] = cover
 
                         print(data_dict)
                         requirements_list.append(data_dict)
-                        
+
                         insert_to_csv_part_2(data_dict=data_dict)
 
                     except Exception as e:
                         print(f"Erreur inattendue : {e}")
                         try:
-                            data_dict['Title'] = title
+                            data_dict["Title"] = title
                         except Exception:
-                            data_dict['Title']=""
-                        data_dict['CPU']=""
-                        data_dict['GPU']=""
-                        data_dict['RAM']=""
+                            data_dict["Title"] = ""
+                        data_dict["CPU"] = ""
+                        data_dict["GPU"] = ""
+                        data_dict["RAM"] = ""
                         try:
-                            data_dict["Image"]=cover
+                            data_dict["Image"] = cover
                         except Exception:
-                            data_dict["Image"]=""
-                        
+                            data_dict["Image"] = ""
+
                         print(data_dict)
                         requirements_list.append(data_dict)
 
                         insert_to_csv_part_2(data_dict=data_dict)
-                        
 
+                # If there is no information about the game.
                 except Exception as e:
                     print(f"Erreur inattendue : {e}")
                     try:
-                        data_dict['Title'] = title
+                        data_dict["Title"] = title
                     except Exception:
-                        data_dict['Title']=""
-                    data_dict['CPU']=""
-                    data_dict['GPU']=""
-                    data_dict['RAM']=""
+                        data_dict["Title"] = ""
+                    data_dict["CPU"] = ""
+                    data_dict["GPU"] = ""
+                    data_dict["RAM"] = ""
                     try:
-                        data_dict["Image"]=cover
+                        data_dict["Image"] = cover
                     except Exception:
-                        data_dict["Image"]=""
-                    
+                        data_dict["Image"] = ""
+
                     print(data_dict)
                     requirements_list.append(data_dict)
 
                     insert_to_csv_part_2(data_dict=data_dict)
 
-                
                 # Go back to games list page
-                
+
                 driver.execute_script("window.history.go(-1)")
     except Exception as e:
         print(f"Erreur inattendue globale : {e}")
         pass
     finally:
         driver.quit()
-
-
