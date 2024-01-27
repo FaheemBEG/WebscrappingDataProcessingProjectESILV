@@ -5,6 +5,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from datascrapping import *
+from calculate import add_consumption
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 path=f"{ROOT_DIR}/_data"
@@ -88,4 +89,5 @@ def csv_to_json(folder_path:str=path):
 
 if __name__ == "__main__":
     create_data_files()
+    add_consumption()
     csv_to_json()
