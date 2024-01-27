@@ -6,3 +6,4 @@ beautifulsoup4==4.12.2
 wget==3.2
 lxml==5.1.0
 undetected-chromedriver==2.1.1
+webdriver_manager==4.0.1

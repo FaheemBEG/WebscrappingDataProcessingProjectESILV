@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from webdriver_manager.chrome import ChromeDriverManager
 
 import undetected_chromedriver as uc
 
@@ -298,18 +299,20 @@ def get_games_scrapped_number(file_path=f"{path}/games_part_2.csv"):
     Exemple:
     {"a":75,"b":96 ...}
     """
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
 
-    df = pd.read_csv(file_path)
-
-    # Counting games by title's 1st letter
-    title_count_by_first_letter = (
-        df["Title"].astype(str).str[0].str.lower().value_counts().to_dict()
-    )
+        # Counting games by title's 1st letter
+        title_count_by_first_letter = (
+            df["Title"].astype(str).str[0].str.lower().value_counts().to_dict()
+        )
+    else:
+        return {}
 
     return title_count_by_first_letter
 
 
-def scrap_howlongtobbeat():
+def scrap_howlongtobbeat(games_scrapped:dict={}):
     """This function scraps games data from HowLongToBeat.com
     Creates the file : _data/games_part_1.csv.
     Columns :
@@ -335,368 +338,427 @@ def scrap_howlongtobbeat():
     chrome_options.add_argument("--ignore-ssl-errors")
     chrome_options.add_argument("start-maximized")
     # chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
-    chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--headless")
 
-    driver = uc.Chrome(options=chrome_options)
+    driver = uc.Chrome(options=chrome_options,driver_executable_path=ChromeDriverManager().install())
     # sets timeout to 30
     driver.set_page_load_timeout(30)
 
-    driver.get("https://howlongtobeat.com/?q=")  # Uncomment to scrapp all games
-    # driver.get('https://howlongtobeat.com/?q=a') # Scrapping only games starting with 'a' for exemple
+    letter_scrapped = list(games_scrapped.keys())
+
+    end_list = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+    ]
+
+    url="https://howlongtobeat.com/?q="
+    #driver.get("https://howlongtobeat.com/?q=")  # Uncomment to scrapp all games
+    #driver.get('https://howlongtobeat.com/?q=a') # Scrapping only games starting with 'a' for exemple
 
     wait = WebDriverWait(driver, 10)
-
-    # Accepting cookies
     try:
-        print("\nAccepting cookies ...")
-        cookies_button = wait.until(
-            EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
-        )
-        cookies_button.click()
-        wait.until(
-            EC.invisibility_of_element_located((By.ID, "onetrust-accept-btn-handler"))
-        )
-        print("\nCookies accepted")
-    except NoSuchElementException as e:
-        print(e)
-        print("\nNo cookies button detected")
-        pass
-    except Exception as e:
-        print(e)
-        pass
+        if len(letter_scrapped) > 1:
+            for k in range(1, len(letter_scrapped)):
+                if letter_scrapped[k] in end_list:
+                    end_list.remove(letter_scrapped[k - 1])
 
-    # Checking if games list is loaded
-    try:
-        page_items = wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CLASS_NAME, "back_darkish.GameCard_search_list__IuMbi")
-            )
-        )
-    except TimeoutException:
-        page_items = wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CLASS_NAME, "back_darkish GameCard_search_list__IuMbi")
-            )
-        )
-    except Exception as e:
-        driver.quit()
-        raise e
+        for letter in end_list:
+            # Browsing all games pages starting with a specific caracter in end_list
+            print("\nConnecting to ",url)
+            driver.get(url + letter)
+            driver.implicitly_wait(10)
 
-    if len(page_items) >= max_games_per_page:
-        iter_games = max_games_per_page
-    else:
-        iter_games = len(page_items)
+            if letter not in letter_scrapped:
+                games_scrapped[letter] = 0
 
-    # Checking the total number of pages
-    try:
-        number_of_pages = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[2]')
-            )
-        )
-        driver.execute_script("arguments[0].scrollIntoView();", number_of_pages)
-        number_of_pages = int(number_of_pages.text.strip())
-        print(f"Number of pages : {number_of_pages}")
+            # Accepting cookies
+            try:
+                print("\nAccepting cookies ...")
+                cookies_button = wait.until(
+                    EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
+                )
+                cookies_button.click()
+                wait.until(
+                    EC.invisibility_of_element_located((By.ID, "onetrust-accept-btn-handler"))
+                )
+                print("\nCookies accepted")
+            except NoSuchElementException as e:
+                print(e)
+                print("\nNo cookies button detected")
+                pass
+            except Exception as e:
+                print(e)
+                pass
 
-    except Exception as e:
-        driver.quit()
-        raise e
-
-    if number_of_pages >= max_pages:
-        iter_pages = max_pages
-    else:
-        iter_pages = number_of_pages
-
-    try:
-        # Treating a page
-        for p in range(iter_pages):
-            print("Page number: ", game_page)
-            print("Number of games in this page: ", len(page_items))
-
-            # Treating a game page
-            for k in range(iter_games):
-                try:
-                    wait.until(
-                        EC.presence_of_all_elements_located(
-                            (By.XPATH, '//*[@id="search-results-header"]/ul')
-                        )
+            # Checking if games list is loaded
+            try:
+                page_items = wait.until(
+                    EC.presence_of_all_elements_located(
+                        (By.CLASS_NAME, "back_darkish.GameCard_search_list__IuMbi")
                     )
-                except TimeoutException:
-                    driver.refresh()
-                    wait.until(
-                        EC.presence_of_all_elements_located(
-                            (By.XPATH, '//*[@id="search-results-header"]/ul')
-                        )
+                )
+            except TimeoutException:
+                page_items = wait.until(
+                    EC.presence_of_all_elements_located(
+                        (By.CLASS_NAME, "back_darkish GameCard_search_list__IuMbi")
                     )
-                except Exception as e:
-                    raise Exception
+                )
+            except Exception as e:
+                driver.quit()
+                raise e
 
-                xpath = f'//*[@id="search-results-header"]/ul/li[{k+1}]/div/div[2]/h3/a'
+            if len(page_items) >= max_games_per_page:
+                iter_games = max_games_per_page
+            else:
+                iter_games = len(page_items)
 
-                # Clicking on game page
-                try:
-                    # Waiting for the page to load
-                    page_item = wait.until(
-                        EC.presence_of_element_located((By.XPATH, xpath))
+            # Checking the total number of pages
+            try:
+                number_of_pages = wait.until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[2]')
                     )
+                )
+                driver.execute_script("arguments[0].scrollIntoView();", number_of_pages)
+                number_of_pages = int(number_of_pages.text.strip())
+                print(f"Number of pages : {number_of_pages}")
 
-                    driver.execute_script("arguments[0].scrollIntoView();", page_item)
-                    print("\nScrolled")
-                    wait.until(EC.element_to_be_clickable(page_item))
-                    print("\nWaited for element to be clickable")
+            except Exception as e:
+                driver.quit()
+                raise e
 
-                    # Scrapping game title
-                    title = page_item.text.strip()
-                    driver.execute_script("arguments[0].click();", page_item)
-                    print("\nAccessed to game page")
+            if number_of_pages >= max_pages:
+                iter_pages = max_pages
+            else:
+                iter_pages = number_of_pages
+            
+            try:
+                # Treating a page
+                for p in range(iter_pages):
+                    print("Page number: ", game_page)
+                    print("Number of games in this page: ", len(page_items))
 
-                except TimeoutException as e:
-                    print(f"Erreur lors du clic : {e}")
-                    # Go back to games list page
-                    driver.back()
+                    # Treating a game page
+                    for k in range(iter_games):
+                        try:
+                            wait.until(
+                                EC.presence_of_all_elements_located(
+                                    (By.XPATH, '//*[@id="search-results-header"]/ul')
+                                )
+                            )
+                        except TimeoutException:
+                            driver.refresh()
+                            wait.until(
+                                EC.presence_of_all_elements_located(
+                                    (By.XPATH, '//*[@id="search-results-header"]/ul')
+                                )
+                            )
+                        except Exception as e:
+                            raise Exception
 
-                    # Retry clicking on the element
-                    try:
-                        # Waiting for the page to load
-                        page_item = wait.until(
-                            EC.presence_of_element_located((By.XPATH, xpath))
-                        )
+                        xpath = f'//*[@id="search-results-header"]/ul/li[{k+1}]/div/div[2]/h3/a'
 
-                        driver.execute_script(
-                            "arguments[0].scrollIntoView();", page_item
-                        )
-                        print("\nScrolled")
-                        wait.until(EC.element_to_be_clickable(page_item))
-                        print("\nWaited for element to be clickable")
+                        # Clicking on game page
+                        try:
+                            # Waiting for the page to load
+                            page_item = wait.until(
+                                EC.presence_of_element_located((By.XPATH, xpath))
+                            )
 
-                        # Scrapping game title
-                        title = page_item.text.strip()
-                        driver.execute_script("arguments[0].click();", page_item)
-                        print("\nAccessed to game page")
+                            driver.execute_script("arguments[0].scrollIntoView();", page_item)
+                            print("\nScrolled")
+                            wait.until(EC.element_to_be_clickable(page_item))
+                            print("\nWaited for element to be clickable")
 
-                    except TimeoutException:
-                        print(
-                            "La nouvelle page n'a pas été correctement chargée après le clic."
-                        )
-                        driver.back()
-                        continue
+                            # Scrapping game title
+                            title = page_item.text.strip()
+                            driver.execute_script("arguments[0].click();", page_item)
+                            print("\nAccessed to game page")
 
-                    print("Clic réussi et nouvelle page chargée avec succès.")
+                        except TimeoutException as e:
+                            print(f"Erreur lors du clic : {e}")
+                            # Go back to games list page
+                            driver.back()
 
-                # Scrapping data :
-                try:
-                    games_data = {}
-                    games_data["Title"] = title
-                    print("\nTreating : ", title)
+                            # Retry clicking on the element
+                            try:
+                                # Waiting for the page to load
+                                page_item = wait.until(
+                                    EC.presence_of_element_located((By.XPATH, xpath))
+                                )
 
-                    # Waiting for the page to load
-                    wait = WebDriverWait(driver, 10)
+                                driver.execute_script(
+                                    "arguments[0].scrollIntoView();", page_item
+                                )
+                                print("\nScrolled")
+                                wait.until(EC.element_to_be_clickable(page_item))
+                                print("\nWaited for element to be clickable")
 
-                    # Scrapping main story game time
-                    try:
-                        wait.until(
-                            EC.presence_of_element_located(
-                                (
+                                # Scrapping game title
+                                title = page_item.text.strip()
+                                driver.execute_script("arguments[0].click();", page_item)
+                                print("\nAccessed to game page")
+
+                            except TimeoutException:
+                                print(
+                                    "La nouvelle page n'a pas été correctement chargée après le clic."
+                                )
+                                driver.back()
+                                continue
+
+                            print("Clic réussi et nouvelle page chargée avec succès.")
+
+                        # Scrapping data :
+                        try:
+                            games_data = {}
+                            games_data["Title"] = title
+                            print("\nTreating : ", title)
+
+                            # Waiting for the page to load
+                            wait = WebDriverWait(driver, 10)
+
+                            # Scrapping main story game time
+                            try:
+                                wait.until(
+                                    EC.presence_of_element_located(
+                                        (
+                                            By.XPATH,
+                                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]',
+                                        )
+                                    )
+                                )
+                                main_story_time_element = driver.find_element(
                                     By.XPATH,
                                     '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]',
                                 )
-                            )
-                        )
-                        main_story_time_element = driver.find_element(
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/li[1]',
-                        )
-                        print("Main Story found")
-                    except TimeoutException:
-                        wait.until(
-                            EC.presence_of_element_located(
-                                (
+                                print("Main Story found")
+                            except TimeoutException:
+                                wait.until(
+                                    EC.presence_of_element_located(
+                                        (
+                                            By.XPATH,
+                                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]',
+                                        )
+                                    )
+                                )
+                                main_story_time_element = driver.find_element(
                                     By.XPATH,
                                     '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]',
                                 )
+                                print("Main Story found")
+                            except Exception:
+                                pass
+
+                            driver.execute_script(
+                                "arguments[0].scrollIntoView();", main_story_time_element
                             )
-                        )
-                        main_story_time_element = driver.find_element(
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[1]/ul/div/li[1]',
-                        )
-                        print("Main Story found")
-                    except Exception:
-                        pass
+                            table = main_story_time_element.text.strip()
+                            mainstory = table.partition("Main Story")[2].strip()
+                            try:
+                                mainstory = mainstory.partition("Hours")[0].strip()
+                            except Exception:
+                                mainstory = table.partition("Main Story")[2].strip()
+                            games_data["Main Story (Hours)"] = mainstory
+                            print("Main Story scrapped")
 
-                    driver.execute_script(
-                        "arguments[0].scrollIntoView();", main_story_time_element
-                    )
-                    table = main_story_time_element.text.strip()
-                    mainstory = table.partition("Main Story")[2].strip()
-                    try:
-                        mainstory = mainstory.partition("Hours")[0].strip()
-                    except Exception:
-                        mainstory = table.partition("Main Story")[2].strip()
-                    games_data["Main Story (Hours)"] = mainstory
-                    print("Main Story scrapped")
+                            # Scrapping plateform
+                            try:
+                                plateform_element = driver.find_element(
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]',
+                                )
+                                driver.execute_script(
+                                    "arguments[0].scrollIntoView();", plateform_element
+                                )
+                                table = plateform_element.text.strip()
+                                plateform = table.partition("Platforms:")[2].strip()
+                                games_data["Platforms"] = plateform
+                                print("Platforms scrapped")
+                            except Exception:
+                                pass
 
-                    # Scrapping plateform
-                    try:
-                        plateform_element = driver.find_element(
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[4]',
-                        )
-                        driver.execute_script(
-                            "arguments[0].scrollIntoView();", plateform_element
-                        )
-                        table = plateform_element.text.strip()
-                        plateform = table.partition("Platforms:")[2].strip()
-                        games_data["Platforms"] = plateform
-                        print("Platforms scrapped")
-                    except Exception:
-                        pass
+                            # Scrapping genres
+                            try:
+                                genres_element = driver.find_element(
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]',
+                                )
+                                driver.execute_script(
+                                    "arguments[0].scrollIntoView();", genres_element
+                                )
+                                table = genres_element.text.strip()
+                                genres = table.partition("Genres:")[2].strip()
+                                games_data["Genres"] = genres
+                                print("Genres scrapped")
+                            except Exception:
+                                pass
 
-                    # Scrapping genres
-                    try:
-                        genres_element = driver.find_element(
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div[2]/div/div[2]/div[2]/div[5]',
-                        )
-                        driver.execute_script(
-                            "arguments[0].scrollIntoView();", genres_element
-                        )
-                        table = genres_element.text.strip()
-                        genres = table.partition("Genres:")[2].strip()
-                        games_data["Genres"] = genres
-                        print("Genres scrapped")
-                    except Exception:
-                        pass
-
-                    # Scrapping game cover
-                    try:
-                        wait.until(
-                            EC.presence_of_element_located(
-                                (
+                            # Scrapping game cover
+                            try:
+                                wait.until(
+                                    EC.presence_of_element_located(
+                                        (
+                                            By.XPATH,
+                                            '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img',
+                                        )
+                                    )
+                                )
+                                cover_element = driver.find_element(
                                     By.XPATH,
                                     '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img',
                                 )
-                            )
-                        )
-                        cover_element = driver.find_element(
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div[2]/div/div[1]/div[1]/div[1]/img',
-                        )
-                        print("Cover found")
-                        driver.execute_script(
-                            "arguments[0].scrollIntoView();", cover_element
-                        )
-                        cover = cover_element.get_attribute("src")
-                        print(cover)
-                        cover = cover.split("?")[0]
-                        games_data["Image"] = cover
-                        print("Game cover scrapped")
-                    except Exception:
-                        pass
-
-                    print(games_data)
-                    games_list.append(games_data)
-
-                    csv_file_path = f"{path}/games_part_1.csv"
-
-                    # Checking if CSV file exists
-                    if os.path.exists(csv_file_path):
-                        # Loading CSV file
-                        existing_df = pd.read_csv(csv_file_path)
-                        try:
-                            existing_df["Main Story (Hours)"] = (
-                                existing_df["Main Story (Hours)"]
-                                .str.extract("(\d+)")
-                                .astype(int)
-                            )
-                        except Exception:
-                            pass
-
-                        # Checking if the line already exists
-                        if not existing_df[
-                            existing_df["Title"] == games_data["Title"]
-                        ].empty:
-                            print("Data already exists in the file")
-                        else:
-                            # Adding line
-                            with open(
-                                csv_file_path, "a", newline="", encoding="utf-8"
-                            ) as f_object:
-                                dictwriter_object = DictWriter(
-                                    f_object, fieldnames=list(games_data.keys())
+                                print("Cover found")
+                                driver.execute_script(
+                                    "arguments[0].scrollIntoView();", cover_element
                                 )
+                                cover = cover_element.get_attribute("src")
+                                print(cover)
+                                cover = cover.split("?")[0]
+                                games_data["Image"] = cover
+                                print("Game cover scrapped")
+                            except Exception:
+                                pass
 
-                                # Using DictWriter
-                                dictwriter_object.writerow(games_data)
-                                # Close the file object
-                                f_object.close()
-                                print(f"\nGame data added to {csv_file_path} !")
+                            print(games_data)
+                            games_list.append(games_data)
 
-                    # If doesn't exists, creating the csv file.
-                    else:
-                        final_df = pd.DataFrame([games_data])
-                        try:
-                            final_df["Main Story (Hours)"] = (
-                                final_df["Main Story (Hours)"]
-                                .str.extract("(\d+)")
-                                .astype(int)
+                            csv_file_path = f"{path}/games_part_1.csv"
+
+                            # Checking if CSV file exists
+                            if os.path.exists(csv_file_path):
+                                # Loading CSV file
+                                existing_df = pd.read_csv(csv_file_path)
+                                try:
+                                    existing_df["Main Story (Hours)"] = (
+                                        existing_df["Main Story (Hours)"]
+                                        .str.extract("(\d+)")
+                                        .astype(int)
+                                    )
+                                except Exception:
+                                    pass
+
+                                # Checking if the line already exists
+                                if not existing_df[
+                                    existing_df["Title"] == games_data["Title"]
+                                ].empty:
+                                    print("Data already exists in the file")
+                                else:
+                                    # Adding line
+                                    with open(
+                                        csv_file_path, "a", newline="", encoding="utf-8"
+                                    ) as f_object:
+                                        dictwriter_object = DictWriter(
+                                            f_object, fieldnames=list(games_data.keys())
+                                        )
+
+                                        # Using DictWriter
+                                        dictwriter_object.writerow(games_data)
+                                        # Close the file object
+                                        f_object.close()
+                                        print(f"\nGame data added to {csv_file_path} !")
+
+                            # If doesn't exists, creating the csv file.
+                            else:
+                                final_df = pd.DataFrame([games_data])
+                                try:
+                                    final_df["Main Story (Hours)"] = (
+                                        final_df["Main Story (Hours)"]
+                                        .str.extract("(\d+)")
+                                        .astype(int)
+                                    )
+                                except Exception:
+                                    pass
+                                final_df.to_csv(csv_file_path, index=False, encoding="utf-8")
+                                print(f"\nCSV file successfuly created at {csv_file_path} !")
+
+                            wait = WebDriverWait(driver, 10)
+
+                        except NoSuchElementException:
+                            continue
+
+                        # Go back to games list page
+                        driver.back()
+
+                    wait = WebDriverWait(driver, 20)
+
+                    if game_page == 1:
+                        next_page_button = wait.until(
+                            EC.element_to_be_clickable(
+                                (
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]',
+                                )
                             )
-                        except Exception:
-                            pass
-                        final_df.to_csv(csv_file_path, index=False, encoding="utf-8")
-                        print(f"\nCSV file successfuly created at {csv_file_path} !")
-
-                    wait = WebDriverWait(driver, 10)
-
-                except NoSuchElementException:
-                    continue
-
-                # Go back to games list page
-                driver.back()
-
-            wait = WebDriverWait(driver, 20)
-
-            if game_page == 1:
-                next_page_button = wait.until(
-                    EC.element_to_be_clickable(
-                        (
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]',
                         )
-                    )
-                )
-                next_page_button = driver.find_element(
-                    By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]'
-                )
-            else:
-                next_page_button = wait.until(
-                    EC.element_to_be_clickable(
-                        (
-                            By.XPATH,
-                            '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]',
+                        next_page_button = driver.find_element(
+                            By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]'
                         )
-                    )
-                )
-                next_page_button = driver.find_element(
-                    By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]'
-                )
+                    else:
+                        next_page_button = wait.until(
+                            EC.element_to_be_clickable(
+                                (
+                                    By.XPATH,
+                                    '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]',
+                                )
+                            )
+                        )
+                        next_page_button = driver.find_element(
+                            By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]'
+                        )
 
-            driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
-            wait.until(EC.element_to_be_clickable(next_page_button))
+                    driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+                    wait.until(EC.element_to_be_clickable(next_page_button))
 
-            game_page += 1
+                    game_page += 1
 
-            # Clicking on next page
-            try:
-                driver.execute_script(
-                    "arguments[0].scrollIntoView();", next_page_button
-                )
-                wait.until(EC.element_to_be_clickable(next_page_button))
-                driver.execute_script("arguments[0].click();", next_page_button)
+                    # Clicking on next page
+                    try:
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView();", next_page_button
+                        )
+                        wait.until(EC.element_to_be_clickable(next_page_button))
+                        driver.execute_script("arguments[0].click();", next_page_button)
+
+                    except Exception as e:
+                        raise Exception
 
             except Exception as e:
-                raise Exception
-
+                print(e)
+                pass
     except Exception as e:
         print(e)
         pass
@@ -729,7 +791,7 @@ def scrap_canyourunit(games_scrapped: dict = {}):
     chrome_options.add_argument("--ignore-ssl-errors")
     # chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
 
-    driver = uc.Chrome(options=chrome_options)
+    driver = uc.Chrome(options=chrome_options,driver_executable_path=ChromeDriverManager().install())
 
     # sets timeout to 30
     driver.set_page_load_timeout(30)

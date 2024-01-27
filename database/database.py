@@ -17,7 +17,7 @@ path = ROOT_DIR + "/_data"
 
 def create_data_files(
     path=path,
-    bool_scrap_howlongtobeat: bool = False,
+    bool_scrap_howlongtobeat: bool = True,
     bool_scrap_canyourunit: bool = False,
 ):  # False by default because data already scraped in /_data
     """This function creates all data files needed by using functions in 'datascrapping.py'.
@@ -30,15 +30,21 @@ def create_data_files(
 
     print(f"\n Creating data files . . .")
 
-    scrap_processors()
-    scrap_graphiccards()
+    # scrap_processors()
+    # scrap_graphiccards()
 
     if bool_scrap_howlongtobeat:
-        try:
-            scrap_howlongtobbeat()
-        except Exception as e:
-            print(e)
-            pass
+        # Scrapping HowLongToBeat website by avoiding games that are already scrapped :
+        games_scrapped = get_games_scrapped_number(file_path=f"{path}/games_part_1.csv")
+        while "9" not in games_scrapped.keys():
+            try:
+                print("\nHowLongToBeat games already scrapped : ", games_scrapped)
+                scrap_howlongtobbeat(games_scrapped=games_scrapped)
+                games_scrapped = get_games_scrapped_number()
+            except Exception as e:
+                games_scrapped = get_games_scrapped_number()
+                print(e)
+                continue
 
     if bool_scrap_canyourunit:
         # Scrapping Can You Run It website by avoiding games that are already scrapped :
