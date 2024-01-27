@@ -33,7 +33,7 @@ def create_data_files(
     scrap_processors()
     scrap_graphiccards()
 
-    while bool_scrap_howlongtobeat:
+    if bool_scrap_howlongtobeat:
         try:
             scrap_howlongtobbeat()
         except Exception as e:
@@ -72,9 +72,11 @@ def create_data_files(
             suffixes=("", "_part_2"),
         )
         final_df["Image"] = final_df["Image"].combine_first(final_df["Image_part_2"])
+        final_df['Platforms'] = final_df['Platforms'].combine_first(final_df['Platforms_part_2'])
 
         # Deleting duplicated columns
         final_df.drop(["Image_part_2"], axis=1, inplace=True)
+        final_df.drop(["Platforms_part_2"], axis=1, inplace=True)
 
         final_df["Title"] = final_df["Title"].str.capitalize()
 
@@ -132,4 +134,4 @@ def csv_to_json(file_path: str = path):
 
 if __name__ == "__main__":
     create_data_files()
-    csv_to_json()
+    #csv_to_json()

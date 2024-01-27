@@ -988,12 +988,19 @@ def scrap_canyourunit(games_scrapped: dict = {}):
                         data_dict["Title"] = title
                         if "CPU" in dict.keys():
                             data_dict["CPU"] = dict["CPU"]
+                        else:
+                            data_dict["CPU"] = ""
                         if "VIDEO CARD" in dict.keys():
                             data_dict["GPU"] = dict["VIDEO CARD"]
+                        else:
+                            data_dict["GPU"] = ""
                         if "RAM" in dict.keys():
                             data_dict["RAM"] = dict["RAM"]
+                        else:
+                            data_dict["RAM"] = ""
 
                         data_dict["Image"] = cover
+                        data_dict["Platforms"] = "PC" # Platforms contains at least PC as it is a website for PC games
 
                         print(data_dict)
                         requirements_list.append(data_dict)
@@ -1013,6 +1020,8 @@ def scrap_canyourunit(games_scrapped: dict = {}):
                             data_dict["Image"] = cover
                         except Exception:
                             data_dict["Image"] = ""
+                        data_dict["Platforms"] = "PC" # Platforms contains at least PC as it is a website for PC games
+
 
                         print(data_dict)
                         requirements_list.append(data_dict)
@@ -1033,6 +1042,8 @@ def scrap_canyourunit(games_scrapped: dict = {}):
                         data_dict["Image"] = cover
                     except Exception:
                         data_dict["Image"] = ""
+                    data_dict["Platforms"] = "PC" # Platforms contains at least PC as it is a website for PC games
+
 
                     print(data_dict)
                     requirements_list.append(data_dict)
