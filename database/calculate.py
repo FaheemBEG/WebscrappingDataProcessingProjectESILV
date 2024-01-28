@@ -33,9 +33,12 @@ def find_best_match(standardized_models, model_df):
     return best_match if model_matches[best_match] > 0 else None
 
 
-
-
 def calculate_consumption(game_row, boavizta):
+    """
+    This function calculate the estimation of the carbon footprint of a game by using :
+    Gametime, the total platform's carbon footprint without the percentage of usage and other default values.
+    It is almost impossible to estimate the carbon footprint of components because of the lack of transparency by manufacturers.
+    """
     # Extraction des données nécessaires de la ligne de jeu
     platform = game_row['Platforms']
     main_story_hours = float(game_row['Main Story (Hours)'])
@@ -45,8 +48,8 @@ def calculate_consumption(game_row, boavizta):
 
     # Détermination des TDP par défaut
     TDP_screen = 12    # Dell E2222H Monitor
-    TDP_processor = 23   # Boavizta
-    TDP_gpu = 120         # Gigabyte GTX 1060
+    #TDP_processor = 23   # Boavizta
+    #TDP_gpu = 120         # Gigabyte GTX 1060
     TDP_ssd = 2.5      # BarraCuda 120 SSD
     TDP_motherboard = 80 # Gigabyte Z370 AORUS Gaming
     TDP_ram = 3          # Buildcomputers
@@ -77,9 +80,8 @@ def calculate_consumption(game_row, boavizta):
 
     # Game time determination
     gametime = 15  # Default value
-    if main_story_hours and main_story_hours != -1:
+    if main_story_hours and main_story_hours != -1 and not pd.isna(main_story_hours):
         gametime = main_story_hours
-
 
 
     # Platform specific adjustments

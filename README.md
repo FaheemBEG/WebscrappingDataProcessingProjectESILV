@@ -17,5 +17,5 @@ Note:
     An extract of full dataset is also available in `_data` folder, so that you don't need to run the `create_data_file` function from `database/database.py` and wait your dataset to be downloaded
 
 To display the website, execute in your terminal : `python -m http.server`
-Then in your browser, enter : `http://localhost:8000/`
+Then in your browser, enter : `http://localhost:8000/web/`
 The website should display.

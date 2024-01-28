@@ -3,7 +3,13 @@
 
 # Except
 !games.csv
+!games_consumption.csv
 !gpu.csv
 !processors.csv
 !boavizta_data.csv
+
+!games_consumption.json
 !games.json
+!boavizta_data.json
+!gpu.json
+!processors.json
