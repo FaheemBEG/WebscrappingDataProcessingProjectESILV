@@ -165,6 +165,14 @@ def add_consumption(data_path:str = path):
                 else None,
                 axis=1
             )
+        column_name = f"Total_kWh_{console.lower().replace(' ', '_')}"
+        if column_name not in df_games.columns:
+            df_games[column_name] = df_games.apply(
+                lambda row: calculate_consumption(row, boavizta)["Total_kWh"]
+                if pd.notna(row["Platforms"]) and console.lower() in row["Platforms"].lower()
+                else None,
+                axis=1
+            )
 
 
     # Enregistrement des modifications dans le fichier CSV

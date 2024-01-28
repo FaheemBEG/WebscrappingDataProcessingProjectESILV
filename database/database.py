@@ -142,7 +142,7 @@ def csv_to_json(folder_path: str = path):
             df = pd.read_csv(file_path)
             df.columns = df.columns.str.replace(' ', '_')
             output_file_path = file_path.split(".")[0] + ".json"
-            df.to_json(output_file_path, force_ascii=False)
+            df.to_json(output_file_path,orient="records",indent=4, force_ascii=False)
 
     return
 
