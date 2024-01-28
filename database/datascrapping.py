@@ -326,7 +326,6 @@ def scrap_howlongtobbeat(games_scrapped:dict={}):
     print(f"\n>>> Scrapping games data from HowLongToBeat.com ...")
 
     games_list = []
-    game_page = 1  # Initialisation of this variable
     max_games_per_page = (
         30  # Maximum number of games per page to scrap for example. Default 30
     )
@@ -398,9 +397,10 @@ def scrap_howlongtobbeat(games_scrapped:dict={}):
 
         for letter in end_list:
             # Browsing all games pages starting with a specific caracter in end_list
-            print("\nConnecting to ",url)
+            print("\nConnecting to ",url+letter)
             driver.get(url + letter)
             driver.implicitly_wait(10)
+            game_page = 1  # Initialisation of this variable
 
             if letter not in letter_scrapped:
                 games_scrapped[letter] = 0
@@ -727,6 +727,8 @@ def scrap_howlongtobbeat(games_scrapped:dict={}):
                         next_page_button = driver.find_element(
                             By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[1]'
                         )
+                        driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+                        wait.until(EC.element_to_be_clickable(next_page_button))
                     else:
                         next_page_button = wait.until(
                             EC.element_to_be_clickable(
@@ -740,8 +742,8 @@ def scrap_howlongtobbeat(games_scrapped:dict={}):
                             By.XPATH, '//*[@id="__next"]/div/main/div/div/div[6]/div/button[3]'
                         )
 
-                    driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
-                    wait.until(EC.element_to_be_clickable(next_page_button))
+                        driver.execute_script("arguments[0].scrollIntoView();", next_page_button)
+                        wait.until(EC.element_to_be_clickable(next_page_button))
 
                     game_page += 1
 
