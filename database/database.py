@@ -31,8 +31,8 @@ def create_data_files(
 
     print(f"\n Creating data files . . .")
 
-    # scrap_processors()
-    # scrap_graphiccards()
+    scrap_processors()
+    scrap_graphiccards()
 
     if bool_scrap_howlongtobeat:
         # Scrapping HowLongToBeat website by avoiding games that are already scrapped :
