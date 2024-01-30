@@ -337,7 +337,7 @@ def scrap_howlongtobbeat(games_scrapped:dict={}):
     chrome_options.add_argument("--ignore-ssl-errors")
     chrome_options.add_argument("start-maximized")
     # chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2,})
-    #chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
 
     driver = uc.Chrome(options=chrome_options,driver_executable_path=ChromeDriverManager().install())
     # sets timeout to 30
