@@ -1,17 +1,17 @@
-let jsonData = []; // Variable globale pour stocker les données JSON
+let jsonData = []; // Var to stock jsonData
 
 document.addEventListener('DOMContentLoaded', function() {
     loadJsonData();
 });
 
-// Chargement et stockage des données JSON
+// Loading games .json file
 async function loadJsonData() {
     const response = await fetch('../_data/games_consumption.json');
     jsonData = await response.json();
     displayData(jsonData);
 }
 
-// Fonction d'affichage des données
+// Data displaying function
 function displayData(data) {
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = '';
@@ -32,7 +32,7 @@ function displayData(data) {
     });
 }
 
-// Recherche de jeux
+// searchGames function 
 function searchGames() {
     const searchText = document.getElementById('search-input').value.toLowerCase();
     const filteredData = jsonData.filter(game => game.Title.toLowerCase().includes(searchText));
@@ -41,7 +41,6 @@ function searchGames() {
 
 function filterByPlatform(platform) {
     const filteredData = jsonData.filter(game => {
-        // Vérifie si la propriété 'Platforms' existe et n'est pas null, puis vérifie si elle inclut la plateforme spécifiée
         return game.Platforms && game.Platforms.includes(platform);
     });
     displayData(filteredData);
@@ -49,9 +48,7 @@ function filterByPlatform(platform) {
 
 
 function selectOption(element) {
-    // Retirer la classe 'selected-option' de tous les éléments
     document.querySelectorAll('.dropdown-content a').forEach(a => a.classList.remove('selected-option'));
     
-    // Ajouter la classe 'selected-option' à l'élément cliqué
     element.classList.add('selected-option');
 }
